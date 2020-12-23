@@ -1,9 +1,7 @@
 #!/bin/sh
 
-if [ ! -d /opt/postgres-data/system ] ; then
- mkdir -p /opt/postgres-data/system
- chown postgres:postgres /opt/postgres-data/system
- /usr/bin/initdb -D /opt/postgres-data/system
+if [ ! -f /opt/postgres-data/PG_VERSION ] ; then
+ /usr/local/pgsql/bin/initdb -D /opt/postgres-data
 fi
-/usr/bin/postgres -D /opt/postgres-data/system
+/usr/local/pgsql/bin/postgres -D /opt/postgres-data
 
