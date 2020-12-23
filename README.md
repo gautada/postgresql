@@ -13,4 +13,11 @@ https://docs.docker.com/engine/examples/postgresql_service/
 ### Deploy Script
 ```docker tag psql:latest localhost:32000/psql:latest && docker push localhost:32000/psql:latest```
 
-Set listen_addresses = 'localhost' to listen_addresses = '*' 
+
+Update pg_hba.conf without restart.
+
+https://github.com/citusdata/pg_auto_failover/issues/67
+```
+k exec -n data pods/postgres-0 -it -- /usr/bin/psql -c "SELECT pg_reload_conf();"
+```
+
