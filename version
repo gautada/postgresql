@@ -1,0 +1,6 @@
+#!/bin/sh
+# VERSION=$(/usr/bin/postgres --version)
+VERSION="$(docker exec -it postgres postgres --version)"
+APP="$(echo $VERSION | cut -d' ' -f1)"
+VERSION="$(echo $VERSION | cut -d' ' -f3)"
+echo "$APP-$VERSION"
