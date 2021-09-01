@@ -1,2 +1,3 @@
 # Ignore Xcode files
 *.xcodeproj/
+.DS_Store
