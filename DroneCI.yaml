@@ -1,0 +1,21 @@
+kind: pipeline
+type: kubernetes
+name: Continuous Build
+
+steps:
+- name: integrate
+  image: gautada/builder:v1.21.4_v3.2.3
+  privileged: true
+  environment:
+    DOCKER_USERNAME:
+      from_secret: username.docker.io
+    DOCKER_PASSWORD:
+      from_secret: password.docker.io
+    ALPINE_TAG: 3.14.1
+    OCI_VERSION: REL_13_4
+  commands:
+  - buildah login --username=$DOCKER_USERNAME --password=$DOCKER_PASSWORD docker.io
+  - buildah bud --build-arg ALPINE_TAG=$ALPINE_TAG --tag homebridge:dev -f Containerfile
+  - buildah push localhost/homebridge:dev docker://docker.io/gautada/homebridge:$OCI_VERSION
+
+

@@ -1,18 +1,29 @@
 # PostgeSQL
 
+[PostgreSQL](https://www.postgresql.org) PostgreSQL is a powerful, open source object-relational database system with over 30 years of active development that has earned it a strong reputation for reliability, feature robustness, and performance.
+
+
+
 https://docs.docker.com/engine/examples/postgresql_service/
 
 ## Container
 
-### Build Script
-```docker build --tag psql:$(date '+%Y-%m-%d')-build . && docker tag psql:$(date '+%Y-%m-%d')-build psql:latest```
+### Versions
 
-### Run Script
-```docker run -Pit --rm --name psql psql:latest /bin/bash```
+As of [September 1, 2021](https://www.postgresql.org/docs/) - Active version is 13.4 as tag [REL_13_4](https://github.com/postgres/postgres/tags)
 
-### Deploy Script
-```docker tag psql:latest localhost:32000/psql:latest && docker push localhost:32000/psql:latest```
+### Manual (Docker)
 
+#### Build
+
+```
+docker build --build-arg ALPINE_TAG=3.14.1 --build-arg BRANCH=REL_13_4 --tag psql:dev -f Containerfile . 
+```
+
+#### Run
+```
+docker run -i -p 4321:43231 -t --name psql --rm psql:dev
+```
 
 Update pg_hba.conf without restart.
 
