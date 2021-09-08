@@ -10,7 +10,7 @@ https://docs.docker.com/engine/examples/postgresql_service/
 
 ### Versions
 
-As of [September 1, 2021](https://www.postgresql.org/docs/) - Active version is 13.4 as tag [REL_13_4](https://github.com/postgres/postgres/tags)
+- [September 1, 2021](https://www.postgresql.org/docs/) - Active version is 13.4 as tag [REL_13_4](https://github.com/postgres/postgres/tags)
 
 ### Manual (Docker)
 
