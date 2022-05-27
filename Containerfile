@@ -35,7 +35,37 @@ RUN ./configure \
 
 # ╭――――――――――――――――---------------------------------------------------------――╮
 # │                                                                           │
-# │ STAGE 2: postgres-container                                                                           │
+# │ STAGE 2: src-pgweb - Build pgweb from source                        │
+# │                                                                           │
+# ╰―――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――╯
+FROM gautada/alpine:$ALPINE_VERSION as src-pgweb
+
+# ╭――――――――――――――――――――╮
+# │ VERSION            │
+# ╰――――――――――――――――――――╯
+ARG PGWEB_VERSION=0.11.11
+ARG PGWEB_BRANCH=v"$PGWEB_VERSION"
+
+# ╭――――――――――――――――――――╮
+# │ PACKAGES           │
+# ╰――――――――――――――――――――╯
+RUN apk add --no-cache go build-base
+
+# ╭――――――――――――――――――――╮
+# │ SOURCE             │
+# ╰――――――――――――――――――――╯
+RUN git clone --branch $PGWEB_BRANCH --depth 1 https://github.com/sosedoff/pgweb.git
+
+# ╭――――――――――――――――――――╮
+# │ BUILD              │
+# ╰――――――――――――――――――――╯
+WORKDIR /pgweb
+RUN make build
+
+
+# ╭――――――――――――――――---------------------------------------------------------――╮
+# │                                                                           │
+# │ STAGE 3: postgres-container                                                                           │
 # │                                                                           │
 # ╰―――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――╯
 FROM gautada/alpine:$ALPINE_VERSION
@@ -50,19 +80,19 @@ LABEL description="An postgres container"
 # ╭――――――――――――――――――――╮
 # │ PORTS              │
 # ╰――――――――――――――――――――╯
-EXPOSE 5432
+EXPOSE 5432/tcp
+EXPOSE 8081/tcp
 
 # ╭――――――――――――――――――――╮
-# │ PACKAGES           │
+# │ APPLICATION        │
 # ╰――――――――――――――――――――╯
-RUN apk add --no-cache readline
-
-# /usr/local/pgsql
+RUN /sbin/apk add --no-cache readline
 COPY --from=src-postgres /usr/local/pgsql /usr/local/pgsql
-
-COPY 10-entrypoint.sh /etc/entrypoint.d/10-entrypoint.sh
+RUN /bin/ln -s /usr/local/pgsql/bin/* /usr/bin/
+COPY --from=src-pgweb /pgweb/pgweb /usr/bin/pgweb
+COPY 10-ep-container.sh /etc/entrypoint.d/10-ep-container.sh
 COPY daily-backup.sh /usr/bin/daily-backup
-COPY healthcheck.sh /usr/bin/healthcheck
+# COPY healthcheck.sh /usr/bin/healthcheck
 
 # ╭――――――――――――――――――――╮
 # │ USER               │
@@ -74,7 +104,7 @@ RUN /bin/mkdir -p /opt/$USER \
  && /usr/sbin/adduser -D -s /bin/ash -G $USER $USER \
  && /usr/sbin/usermod -aG wheel $USER \
  && /bin/echo "$USER:$USER" | chpasswd \
- && /bin/chown $USER:$USER -R /opt/$USER 
+ && /bin/chown $USER:$USER -R /opt/$USER
  
 USER $USER
 WORKDIR /home/$USER
