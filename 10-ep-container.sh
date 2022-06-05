@@ -21,7 +21,7 @@ if [ -z "$ENTRYPOINT_PARAMS" ] ; then # Run as container app
  if [ $? -eq 1 ] ; then
   unset TEST
   echo "---------- [ WEB APPLICATION(pgweb) ] ----------"
-  /usr/bin/pgweb --bind 0.0.0.0 --host localhost --user postgres
+  /usr/bin/pgweb --bind 0.0.0.0 --listen 8080 --host localhost --user postgres
  fi
 fi
 

@@ -1,9 +1,9 @@
 ARG ALPINE_VERSION=3.14.1
 
-# ╭――――――――――――――――---------------------------------------------------------――╮
-# │                                                                           │
-# │ STAGE 1: src-postgres - Build postgres from source                        │
-# │                                                                           │
+# ╭―――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――╮
+# │                                                                         │
+# │ STAGE 1: src-postgres - Build postgres from source                      │
+# │                                                                         │
 # ╰―――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――╯
 FROM gautada/alpine:$ALPINE_VERSION as src-postgres
 
@@ -33,10 +33,10 @@ RUN ./configure \
  && make \
  && make install
 
-# ╭――――――――――――――――---------------------------------------------------------――╮
-# │                                                                           │
-# │ STAGE 2: src-pgweb - Build pgweb from source                        │
-# │                                                                           │
+# ╭―――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――╮
+# │                                                                         │
+# │ STAGE 2: src-pgweb - Build pgweb from source                            │
+# │                                                                         │
 # ╰―――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――╯
 FROM gautada/alpine:$ALPINE_VERSION as src-pgweb
 
@@ -63,10 +63,10 @@ WORKDIR /pgweb
 RUN make build
 
 
-# ╭――――――――――――――――---------------------------------------------------------――╮
-# │                                                                           │
-# │ STAGE 3: postgres-container                                                                           │
-# │                                                                           │
+# ╭――――――――――――――――-------------------------------------------------------――╮
+# │                                                                         │
+# │ STAGE 3: postgres-container                                             │
+# │                                                                         │
 # ╰―――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――╯
 FROM gautada/alpine:$ALPINE_VERSION
 
@@ -75,7 +75,7 @@ FROM gautada/alpine:$ALPINE_VERSION
 # ╰――――――――――――――――――――╯
 LABEL source="https://github.com/gautada/postgres-container.git"
 LABEL maintainer="Adam Gautier <adam@gautier.org>"
-LABEL description="An postgres container"
+LABEL description="A postgres container with pgweb GUI"
 
 # ╭――――――――――――――――――――╮
 # │ PORTS              │

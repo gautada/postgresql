@@ -27,6 +27,10 @@ docker build --build-arg ALPINE_VERSION=3.15.4 --build-arg POSTGRES_VERSION=14_3
 
 ### Run
 ```
+
+docker run --detach --name postgres --publish 5432:5432 --publish 8081:8081 --volume ~/Workspace/postgres/postgres-container:/opt/postgres --rm gautada/postgres:14_3
+
+
 docker run --interactive --tty --name postgres --publish 5432:5432 --volume ~/Workspace/postgres/postgres-container:/opt/postgres --rm postgres:dev /usr/local/pgsql/bin/psql
 ``` 
 
