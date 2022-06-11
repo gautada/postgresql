@@ -98,7 +98,7 @@ COPY container-backup /etc/periodic/hourly/container-backup
 # │ USER               │
 # ╰――――――――――――――――――――╯
 ARG USER=postgres
-VOLUME /opt/$USER
+# VOLUME /opt/$USER
 RUN /bin/mkdir -p /opt/$USER \
  && /usr/sbin/addgroup $USER \
  && /usr/sbin/adduser -D -s /bin/ash -G $USER $USER \
