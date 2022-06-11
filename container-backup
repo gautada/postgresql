@@ -4,4 +4,4 @@ if [ ! -d /opt/postgres-data/backup ] ; then
  mkdir -p /opt/postgres-data/backup
 fi
 
-/usr/bin/pg_dumpall > /opt/postgres-data/backup/daily
+/usr/bin/pg_dumpall | bzip2 > "/opt/postgres-data/backup/$(date +'%H')-postgres.sql"

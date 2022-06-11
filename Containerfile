@@ -91,7 +91,7 @@ COPY --from=src-postgres /usr/local/pgsql /usr/local/pgsql
 RUN /bin/ln -s /usr/local/pgsql/bin/* /usr/bin/
 COPY --from=src-pgweb /pgweb/pgweb /usr/bin/pgweb
 COPY 10-ep-container.sh /etc/entrypoint.d/10-ep-container.sh
-COPY daily-backup.sh /usr/bin/daily-backup
+COPY container-backup /etc/periodic/hourly/container-backup
 # COPY healthcheck.sh /usr/bin/healthcheck
 
 # ╭――――――――――――――――――――╮
