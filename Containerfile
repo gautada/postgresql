@@ -95,6 +95,13 @@ COPY container-backup /etc/periodic/hourly/container-backup
 # COPY healthcheck.sh /usr/bin/healthcheck
 
 # ╭――――――――――――――――――――╮
+# │ HEALTHCHECK       │
+# ╰――――――――――――――――――――╯
+COPY hc-disk.sh /etc/healthcheck.d/hc-disk.sh
+COPY hc-postgres.sh /etc/healthcheck.d/hc-postgres.sh
+COPY hc-pgweb.sh /etc/healthcheck.d/hc-pgweb.sh
+
+# ╭――――――――――――――――――――╮
 # │ USER               │
 # ╰――――――――――――――――――――╯
 ARG USER=postgres
