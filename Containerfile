@@ -41,6 +41,12 @@ RUN ./configure \
 FROM gautada/alpine:$ALPINE_VERSION as src-pgweb
 
 # ╭――――――――――――――――――――╮
+# │ VERSION            │
+# ╰――――――――――――――――――――╯
+ARG PGWEB_VERSION=0.11.11
+ARG PGWEB_BRANCH=v"$PGWEB_VERSION"
+
+# ╭――――――――――――――――――――╮
 # │ PACKAGES           │
 # ╰――――――――――――――――――――╯
 RUN apk add --no-cache go build-base git
