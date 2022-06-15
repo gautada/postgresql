@@ -41,15 +41,9 @@ RUN ./configure \
 FROM gautada/alpine:$ALPINE_VERSION as src-pgweb
 
 # ╭――――――――――――――――――――╮
-# │ VERSION            │
-# ╰――――――――――――――――――――╯
-ARG PGWEB_VERSION=0.11.11
-ARG PGWEB_BRANCH=v"$PGWEB_VERSION"
-
-# ╭――――――――――――――――――――╮
 # │ PACKAGES           │
 # ╰――――――――――――――――――――╯
-RUN apk add --no-cache go build-base
+RUN apk add --no-cache go build-base git
 
 # ╭――――――――――――――――――――╮
 # │ SOURCE             │
@@ -61,7 +55,6 @@ RUN git clone --branch $PGWEB_BRANCH --depth 1 https://github.com/sosedoff/pgweb
 # ╰――――――――――――――――――――╯
 WORKDIR /pgweb
 RUN make build
-
 
 # ╭――――――――――――――――-------------------------------------------------------――╮
 # │                                                                         │
@@ -91,11 +84,14 @@ COPY --from=src-postgres /usr/local/pgsql /usr/local/pgsql
 RUN /bin/ln -s /usr/local/pgsql/bin/* /usr/bin/
 COPY --from=src-pgweb /pgweb/pgweb /usr/bin/pgweb
 COPY 10-ep-container.sh /etc/entrypoint.d/10-ep-container.sh
-COPY container-backup /etc/periodic/hourly/container-backup
-# COPY healthcheck.sh /usr/bin/healthcheck
 
 # ╭――――――――――――――――――――╮
-# │ HEALTHCHECK       │
+# │ BACKUP             │
+# ╰――――――――――――――――――――╯
+COPY container-backup.fnc /etc/backup/container-backup.fnc
+ 
+# ╭――――――――――――――――――――╮
+# │ HEALTHCHECK        │
 # ╰――――――――――――――――――――╯
 COPY hc-disk.sh /etc/healthcheck.d/hc-disk.sh
 COPY hc-postgres.sh /etc/healthcheck.d/hc-postgres.sh
