@@ -110,12 +110,12 @@ COPY hc-pgweb.sh /etc/healthcheck.d/hc-pgweb.sh
 # ╰――――――――――――――――――――╯
 ARG USER=postgres
 # VOLUME /opt/$USER
-RUN /bin/mkdir -p /opt/$USER \
+RUN /bin/mkdir -p /opt/$USER /var/backup /opt/backup /temp/backup \
  && /usr/sbin/addgroup $USER \
  && /usr/sbin/adduser -D -s /bin/ash -G $USER $USER \
  && /usr/sbin/usermod -aG wheel $USER \
  && /bin/echo "$USER:$USER" | chpasswd \
- && /bin/chown $USER:$USER -R /opt/$USER
+ && /bin/chown $USER:$USER -R /opt/$USER /etc/backup /var/backup /tmp/backup /opt/backup
  
 USER $USER
 WORKDIR /home/$USER
