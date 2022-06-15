@@ -23,6 +23,7 @@ RUN apk add --no-cache bison build-base flex git linux-headers libxml2-dev \
 # ╭――――――――――――――――――――╮
 # │ SOURCE             │
 # ╰――――――――――――――――――――╯
+RUN git config --global advice.detachedHead false
 RUN git clone --branch $POSTGRES_BRANCH --depth 1 https://github.com/postgres/postgres.git
 
 # ╭――――――――――――――――――――╮
@@ -54,6 +55,7 @@ RUN apk add --no-cache go build-base git
 # ╭――――――――――――――――――――╮
 # │ SOURCE             │
 # ╰――――――――――――――――――――╯
+RUN git config --global advice.detachedHead false
 RUN git clone --branch $PGWEB_BRANCH --depth 1 https://github.com/sosedoff/pgweb.git
 
 # ╭――――――――――――――――――――╮
