@@ -96,7 +96,7 @@ COPY 10-ep-container.sh /etc/entrypoint.d/10-ep-container.sh
 # ╭――――――――――――――――――――╮
 # │ BACKUP             │
 # ╰――――――――――――――――――――╯
-COPY container-backup.fnc /etc/backup/container-backup.fnc
+COPY container-backup.fnc /etc/backup/backup.d/container-backup.fnc
  
 # ╭――――――――――――――――――――╮
 # │ HEALTHCHECK        │
@@ -116,7 +116,6 @@ RUN /bin/mkdir -p /opt/$USER /var/backup /opt/backup /temp/backup \
  && /usr/sbin/usermod -aG wheel $USER \
  && /bin/echo "$USER:$USER" | chpasswd \
  && /bin/chown $USER:$USER -R /opt/$USER /etc/backup /var/backup /tmp/backup /opt/backup
- 
 USER $USER
 WORKDIR /home/$USER
 
