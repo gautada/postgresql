@@ -14,7 +14,7 @@ if [ $? -eq 1 ] ; then
  if [ ! -f $FOLDER_DATASTORE/PG_VERSION ] ; then
   echo "Database is not initialized(/usr/bin/initdb --pgdata=$FOLDER_DATASTORE)"
  else
-  /usr/bin/pg_ctl start --pgdata=$FOLDER_DATASTORE
+  /usr/bin/pg_ctl start --pgdata=$FOLDER_DATASTORE --options="-c config_file=/etc/postgres/postgresql.conf"
  fi
 fi
 
