@@ -7,11 +7,6 @@ ARG ALPINE_VERSION=3.14.1
 # ╰―――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――╯
 FROM gautada/alpine:$ALPINE_VERSION as src-postgres
 
-# ╭――――――――――――――――――――╮
-# │ VERSION            │
-# ╰――――――――――――――――――――╯
-ARG POSTGRES_VERSION=14_3
-ARG POSTGRES_BRANCH=REL_"$POSTGRES_VERSION"
 
 # ╭――――――――――――――――――――╮
 # │ PACKAGES           │
@@ -79,24 +74,46 @@ LABEL maintainer="Adam Gautier <adam@gautier.org>"
 LABEL description="A postgres container with pgweb GUI"
 
 # ╭――――――――――――――――――――╮
+# │ USER               │
+# ╰――――――――――――――――――――╯
+ARG UID=1001
+ARG GID=1001
+ARG USER=postgres
+RUN /usr/sbin/addgroup -g $GID $USER \
+ && /usr/sbin/adduser -D -G $USER -s /bin/ash -u $UID $USER \
+ && /usr/sbin/usermod -aG wheel $USER \
+ && /bin/echo "$USER:$USER" | chpasswd \
+ 
+
+# ╭――――――――――――――――――――╮
 # │ PORTS              │
 # ╰――――――――――――――――――――╯
 EXPOSE 5432/tcp
 EXPOSE 8081/tcp
 
 # ╭――――――――――――――――――――╮
+# │ VERSION            │
+# ╰――――――――――――――――――――╯
+ARG POSTGRES_VERSION=14.3
+ARG POSTGRES_PACKAGE="$POSTGRES_VERSION"-r0
+
+# ╭――――――――――――――――――――╮
 # │ APPLICATION        │
 # ╰――――――――――――――――――――╯
-RUN /sbin/apk add --no-cache readline
-COPY --from=src-postgres /usr/local/pgsql /usr/local/pgsql
-RUN /bin/ln -s /usr/local/pgsql/bin/* /usr/bin/
+RUN /sbin/apk add --no-cache readline postgresql14=$POSTGRES_PACKAGE
 COPY --from=src-pgweb /pgweb/pgweb /usr/bin/pgweb
-COPY 10-ep-container.sh /etc/entrypoint.d/10-ep-container.sh
+COPY 10-ep-container.sh /etc/container/entrypoint.d/10-ep-container.sh
+COPY 10-ex-postgres.sh /etc/container/exitpoint.d/10-ex-postgres.sh
+
+# ╭――――――――――――――――――――╮
+# │ SUDO               │
+# ╰――――――――――――――――――――╯
+# COPY wheel-chown /etc/container/wheel.d/wheel-chown
 
 # ╭――――――――――――――――――――╮
 # │ BACKUP             │
 # ╰――――――――――――――――――――╯
-COPY container-backup.fnc /etc/backup/backup.d/container-backup.fnc
+COPY backup.fnc /etc/container/backup.fnc
  
 # ╭――――――――――――――――――――╮
 # │ HEALTHCHECK        │
@@ -105,21 +122,11 @@ COPY hc-disk.sh /etc/healthcheck.d/hc-disk.sh
 COPY hc-postgres.sh /etc/healthcheck.d/hc-postgres.sh
 COPY hc-pgweb.sh /etc/healthcheck.d/hc-pgweb.sh
 
-# ╭――――――――――――――――――――╮
-# │ USER               │
-# ╰――――――――――――――――――――╯
-ARG UID=1001
-ARG GID=1001
-ARG USER=postgres
-# VOLUME /opt/$USER
-RUN /bin/mkdir -p /opt/$USER /var/backup /opt/backup /temp/backup \
- && /usr/sbin/addgroup -g $GID $USER \
- && /usr/sbin/adduser -D -G $USER -s /bin/ash -u $UID $USER \
- && /usr/sbin/usermod -aG wheel $USER \
- && /bin/echo "$USER:$USER" | chpasswd \
- && /bin/chown $USER:$USER -R /opt/$USER /etc/backup /var/backup /tmp/backup /opt/backup
+
+RUN /bin/mkdir -p /opt/$USER /run/postgresql /var/backup /opt/backup /temp/backup \
+ && /bin/chown -R $USER:$USER /opt/$USER /run/postgresql /var/backup /tmp/backup /opt/backup
+ 
 USER $USER
 WORKDIR /home/$USER
-
-
+VOLUME /opt/$USER
 

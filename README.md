@@ -20,3 +20,10 @@ To make administration more accessible and to make the overall usage easier this
 /usr/bin/psql -c "SELECT pg_reload_conf();"
 ```
 
+Principle
+
+A distribution's package is prefered over building from source over.
+
+https://www.linuxquestions.org/questions/linux-newbie-8/advantages-and-disadvantages-of-source-over-compiled-packages-839437/
+https://www.rpmdeb.com/devops-articles/deployment-from-code-vs-deployment-packages/
+
