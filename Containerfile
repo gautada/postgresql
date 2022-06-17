@@ -2,35 +2,6 @@ ARG ALPINE_VERSION=3.14.1
 
 # ╭―――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――╮
 # │                                                                         │
-# │ STAGE 1: src-postgres - Build postgres from source                      │
-# │                                                                         │
-# ╰―――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――╯
-FROM gautada/alpine:$ALPINE_VERSION as src-postgres
-
-
-# ╭――――――――――――――――――――╮
-# │ PACKAGES           │
-# ╰――――――――――――――――――――╯
-RUN apk add --no-cache bison build-base flex git linux-headers libxml2-dev \
-                       libxml2-utils libxslt-dev openssl-dev perl \
-                       readline-dev zlib-dev
-
-# ╭――――――――――――――――――――╮
-# │ SOURCE             │
-# ╰――――――――――――――――――――╯
-RUN git config --global advice.detachedHead false
-RUN git clone --branch $POSTGRES_BRANCH --depth 1 https://github.com/postgres/postgres.git
-
-# ╭――――――――――――――――――――╮
-# │ BUILD              │
-# ╰――――――――――――――――――――╯
-WORKDIR /postgres
-RUN ./configure \
- && make \
- && make install
-
-# ╭―――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――╮
-# │                                                                         │
 # │ STAGE 2: src-pgweb - Build pgweb from source                            │
 # │                                                                         │
 # ╰―――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――╯
