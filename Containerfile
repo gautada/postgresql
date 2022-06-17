@@ -30,11 +30,11 @@ RUN git clone --branch $PGWEB_BRANCH --depth 1 https://github.com/sosedoff/pgweb
 WORKDIR /pgweb
 RUN make build
 
-# ╭――――――――――――――――-------------------------------------------------------――╮
-# │                                                                         │
-# │ STAGE 3: postgres-container                                             │
-# │                                                                         │
-# ╰―――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――╯
+# ╭―――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――╮
+# │                                                                      │
+# │ STAGE 3: postgres-container                                          │
+# │                                                                      │
+# ╰―――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――╯
 FROM gautada/alpine:$ALPINE_VERSION
 
 # ╭――――――――――――――――――――╮
@@ -53,7 +53,7 @@ ARG USER=postgres
 RUN /usr/sbin/addgroup -g $GID $USER \
  && /usr/sbin/adduser -D -G $USER -s /bin/ash -u $UID $USER \
  && /usr/sbin/usermod -aG wheel $USER \
- && /bin/echo "$USER:$USER" | chpasswd \
+ && /bin/echo "$USER:$USER" | chpasswd
  
 
 # ╭――――――――――――――――――――╮
