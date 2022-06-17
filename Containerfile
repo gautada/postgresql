@@ -93,9 +93,9 @@ COPY backup.fnc /etc/container/backup.fnc
 # ╭――――――――――――――――――――╮
 # │ HEALTHCHECK        │
 # ╰――――――――――――――――――――╯
-COPY hc-disk.sh /etc/healthcheck.d/hc-disk.sh
-COPY hc-postgres.sh /etc/healthcheck.d/hc-postgres.sh
-COPY hc-pgweb.sh /etc/healthcheck.d/hc-pgweb.sh
+COPY hc-disk.sh /etc/container/healthcheck.d/hc-disk.sh
+COPY hc-postgres.sh /etc/container/healthcheck.d/hc-postgres.sh
+COPY hc-pgweb.sh /etc/container/healthcheck.d/hc-pgweb.sh
 
 
 RUN /bin/mkdir -p /opt/$USER /run/postgresql /var/backup /opt/backup /temp/backup \
