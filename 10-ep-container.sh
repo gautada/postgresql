@@ -12,7 +12,7 @@ if [ $? -eq 1 ] ; then
  unset TEST
  echo "---------- [ RDMS SERVER(postgres) ] ----------"
  if [ ! -f $FOLDER_DATASTORE/PG_VERSION ] ; then
-  echo "Database is not initialized(/usr/bin/initdb --pgdata $FOLDER_DATASTORE)"
+  echo "Database is not initialized(/usr/bin/initdb --pgdata=$FOLDER_DATASTORE)"
  else
   /usr/bin/pg_ctl start --pgdata=$FOLDER_DATASTORE
  fi

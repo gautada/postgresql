@@ -73,6 +73,10 @@ ARG POSTGRES_PACKAGE="$POSTGRES_VERSION"-r0
 # ╰――――――――――――――――――――╯
 RUN /sbin/apk add --no-cache readline postgresql14=$POSTGRES_PACKAGE
 COPY --from=src-pgweb /pgweb/pgweb /usr/bin/pgweb
+RUN mkdir -p /etc/postgres \
+ && ln -s /opt/postgres/datastore/postgresql.conf /etc/postgres/postgresql.conf \
+ && ln -s /opt/postgres/datastore/pg_hba.conf /etc/postgres/pg_hba.conf \
+ && ln -s /opt/postgres/datastore/pg_ident.conf /etc/postgres/pg_ident.conf
 COPY 10-ep-container.sh /etc/container/entrypoint.d/10-ep-container.sh
 COPY 10-ex-postgres.sh /etc/container/exitpoint.d/10-ex-postgres.sh
 
@@ -95,7 +99,7 @@ COPY hc-pgweb.sh /etc/healthcheck.d/hc-pgweb.sh
 
 
 RUN /bin/mkdir -p /opt/$USER /run/postgresql /var/backup /opt/backup /temp/backup \
- && /bin/chown -R $USER:$USER /opt/$USER /run/postgresql /var/backup /tmp/backup /opt/backup
+ && /bin/chown -R $USER:$USER /opt/$USER /etc/postgres /run/postgresql /var/backup /tmp/backup /opt/backup
  
 USER $USER
 WORKDIR /home/$USER
