@@ -1,0 +1,32 @@
+kind: pipeline
+type: exec
+name: Container Build - Postgres
+
+
+
+platform:
+  os: linux
+  arch: arm64
+
+steps:
+- name: build
+  environment:
+    ALPINE_VERSION: 3.16.0
+    POSTGRES_VERSION: 14.3
+    PGWEB_VERSION: 0.11.11
+  commands:
+  - podman build --build-arg ALPINE_VERSION=$ALPINE_VERSION --build-arg POSTGRES_VERSION=$POSTGRES_VERSION --file Containerfile --format docker --label revision="$(git rev-parse HEAD)" --label version="$(date +%Y.%m.%d)" --no-cache --tag postgres:build .
+- name: publish
+  environment:
+    POSTGRES_VERSION: 14.3
+    DOCKERIO_USERNAME:
+      from_secret: username.docker.io
+    DOCKERIO_PASSWORD:
+      from_secret: password.docker.io
+  commands:
+   - podman tag postgres:build docker.io/gautada/postgres:$POSTGRES_VERSION
+   - podman login --username=$DOCKERIO_USERNAME --password=$DOCKERIO_PASSWORD docker.io
+   - podman push docker.io/gautada/postgres:$POSTGRES_VERSION
+  
+
+

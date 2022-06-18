@@ -1,54 +1,107 @@
-ARG ALPINE_TAG=3.14.1
-FROM alpine:$ALPINE_TAG as config-alpine
+ARG ALPINE_VERSION=3.14.1
 
-RUN apk add --no-cache tzdata
+# ╭―――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――╮
+# │                                                                         │
+# │ STAGE 2: src-pgweb - Build pgweb from source                            │
+# │                                                                         │
+# ╰―――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――╯
+FROM gautada/alpine:$ALPINE_VERSION as src-pgweb
 
-RUN cp -v /usr/share/zoneinfo/America/New_York /etc/localtime
-RUN echo "America/New_York" > /etc/timezone
+# ╭――――――――――――――――――――╮
+# │ VERSION            │
+# ╰――――――――――――――――――――╯
+ARG PGWEB_VERSION=0.11.11
+ARG PGWEB_BRANCH=v"$PGWEB_VERSION"
 
-FROM alpine:$ALPINE_TAG as src-postgres
+# ╭――――――――――――――――――――╮
+# │ PACKAGES           │
+# ╰――――――――――――――――――――╯
+RUN apk add --no-cache go build-base git
 
-ARG BRANCH=v0.0.0
-RUN apk add --no-cache bison build-base flex \
-                       git linux-headers libxml2-dev \
-                       libxml2-utils libxslt-dev \
-                       openssl-dev perl \
-                       readline-dev zlib-dev
-	
-RUN git clone --branch $BRANCH --depth 1 https://github.com/postgres/postgres.git
+# ╭――――――――――――――――――――╮
+# │ SOURCE             │
+# ╰――――――――――――――――――――╯
+RUN git config --global advice.detachedHead false
+RUN git clone --branch $PGWEB_BRANCH --depth 1 https://github.com/sosedoff/pgweb.git
 
-WORKDIR /postgres
+# ╭――――――――――――――――――――╮
+# │ BUILD              │
+# ╰――――――――――――――――――――╯
+WORKDIR /pgweb
+RUN make build
 
-RUN ./configure \
- && make \
- && make install
+# ╭―――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――╮
+# │                                                                      │
+# │ STAGE 3: postgres-container                                          │
+# │                                                                      │
+# ╰―――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――╯
+FROM gautada/alpine:$ALPINE_VERSION
 
-FROM alpine:$ALPINE_TAG
+# ╭――――――――――――――――――――╮
+# │ METADATA           │
+# ╰――――――――――――――――――――╯
+LABEL source="https://github.com/gautada/postgres-container.git"
+LABEL maintainer="Adam Gautier <adam@gautier.org>"
+LABEL description="A postgres container with pgweb GUI"
 
-EXPOSE 5432
-
-RUN apk add --no-cache readline
-
-COPY --from=config-alpine /etc/localtime /etc/localtime
-COPY --from=config-alpine /etc/timezone /etc/timezone
-
-# /usr/local/pgsql
-COPY --from=src-postgres /usr/local/pgsql /usr/local/pgsql
-
-COPY entrypoint.sh /usr/bin/entrypoint
-COPY backup.sh /usr/bin/backup
-
+# ╭――――――――――――――――――――╮
+# │ USER               │
+# ╰――――――――――――――――――――╯
+ARG UID=1001
+ARG GID=1001
 ARG USER=postgres
-RUN addgroup $USER \
- && adduser -D -s /bin/sh -G $USER $USER \
- && echo "$USER:$USER" | chpasswd
+RUN /usr/sbin/addgroup -g $GID $USER \
+ && /usr/sbin/adduser -D -G $USER -s /bin/ash -u $UID $USER \
+ && /usr/sbin/usermod -aG wheel $USER \
+ && /bin/echo "$USER:$USER" | chpasswd
  
-RUN ln -s /usr/local/pgsql/bin/* /usr/bin/ \
- && mkdir -p /opt/postgres-data \
- && chmod 777 /opt/postgres-data \
- && chown postgres:postgres /opt/postgres-data
 
+# ╭――――――――――――――――――――╮
+# │ PORTS              │
+# ╰――――――――――――――――――――╯
+EXPOSE 5432/tcp
+EXPOSE 8081/tcp
+
+# ╭――――――――――――――――――――╮
+# │ VERSION            │
+# ╰――――――――――――――――――――╯
+ARG POSTGRES_VERSION=14.3
+ARG POSTGRES_PACKAGE="$POSTGRES_VERSION"-r0
+
+# ╭――――――――――――――――――――╮
+# │ APPLICATION        │
+# ╰――――――――――――――――――――╯
+RUN /sbin/apk add --no-cache readline postgresql14=$POSTGRES_PACKAGE
+COPY --from=src-pgweb /pgweb/pgweb /usr/bin/pgweb
+RUN mkdir -p /etc/postgres \
+ && ln -s /opt/postgres/datastore/postgresql.conf /etc/postgres/postgresql.conf \
+ && ln -s /opt/postgres/datastore/pg_hba.conf /etc/postgres/pg_hba.conf \
+ && ln -s /opt/postgres/datastore/pg_ident.conf /etc/postgres/pg_ident.conf
+COPY 10-ep-container.sh /etc/container/entrypoint.d/10-ep-container.sh
+COPY 10-ex-postgres.sh /etc/container/exitpoint.d/10-ex-postgres.sh
+
+# ╭――――――――――――――――――――╮
+# │ SUDO               │
+# ╰――――――――――――――――――――╯
+# COPY wheel-chown /etc/container/wheel.d/wheel-chown
+
+# ╭――――――――――――――――――――╮
+# │ BACKUP             │
+# ╰――――――――――――――――――――╯
+COPY backup.fnc /etc/container/backup.fnc
+ 
+# ╭――――――――――――――――――――╮
+# │ HEALTHCHECK        │
+# ╰――――――――――――――――――――╯
+COPY hc-disk.sh /etc/container/healthcheck.d/hc-disk.sh
+COPY hc-postgres.sh /etc/container/healthcheck.d/hc-postgres.sh
+COPY hc-pgweb.sh /etc/container/healthcheck.d/hc-pgweb.sh
+
+
+RUN /bin/mkdir -p /opt/$USER /run/postgresql /var/backup /opt/backup /temp/backup \
+ && /bin/chown -R $USER:$USER /opt/$USER /etc/postgres /run/postgresql /var/backup /tmp/backup /opt/backup
+ 
 USER $USER
-
-ENTRYPOINT ["/usr/bin/entrypoint"]
+WORKDIR /home/$USER
+VOLUME /opt/$USER
 
