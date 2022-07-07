@@ -8,5 +8,7 @@
 # Ignore and container runtime folders
 **-container/
 
+manifest/
+
 # .dockerignore can simply be a symlink
 .dockerignore
