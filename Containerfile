@@ -65,6 +65,7 @@ EXPOSE 8081/tcp
 # ╭――――――――――――――――――――╮
 # │ CONFIG             │
 # ╰――――――――――――――――――――╯
+RUN rm -rf /etc/postgres
 RUN ln -s /etc/container/configmap.d /etc/postgres
 
 # ╭――――――――――――――――――――╮
