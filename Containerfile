@@ -63,6 +63,11 @@ EXPOSE 5432/tcp
 EXPOSE 8081/tcp
 
 # ╭――――――――――――――――――――╮
+# │ CONFIG             │
+# ╰――――――――――――――――――――╯
+RUN ln -s /etc/container/configmap.d /etc/postgres
+
+# ╭――――――――――――――――――――╮
 # │ VERSION            │
 # ╰――――――――――――――――――――╯
 ARG POSTGRES_VERSION=14.3
@@ -78,7 +83,7 @@ RUN mkdir -p /etc/postgres \
  && ln -s /opt/postgres/datastore/pg_hba.conf /etc/postgres/pg_hba.conf \
  && ln -s /opt/postgres/datastore/pg_ident.conf /etc/postgres/pg_ident.conf
 COPY 10-ep-container.sh /etc/container/entrypoint.d/10-ep-container.sh
-COPY 10-ex-postgres.sh /etc/container/exitpoint.d/10-ex-postgres.sh
+# COPY 10-ex-postgres.sh /etc/container/exitpoint.d/10-ex-postgres.sh
 
 # ╭――――――――――――――――――――╮
 # │ SUDO               │
@@ -88,7 +93,7 @@ COPY 10-ex-postgres.sh /etc/container/exitpoint.d/10-ex-postgres.sh
 # ╭――――――――――――――――――――╮
 # │ BACKUP             │
 # ╰――――――――――――――――――――╯
-COPY backup.fnc /etc/container/backup.fnc
+COPY backup.fnc /etc/container/backup.d/backup.fnc
  
 # ╭――――――――――――――――――――╮
 # │ HEALTHCHECK        │
