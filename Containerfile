@@ -79,9 +79,9 @@ ARG POSTGRES_PACKAGE="$POSTGRES_VERSION"-r0
 # ╰――――――――――――――――――――╯
 RUN /sbin/apk add --no-cache readline postgresql14=$POSTGRES_PACKAGE
 COPY --from=src-pgweb /pgweb/pgweb /usr/bin/pgweb
-RUN ln -s /opt/postgres/datastore/postgresql.conf /etc/postgres/postgresql.conf \
- && ln -s /opt/postgres/datastore/pg_hba.conf /etc/postgres/pg_hba.conf \
- && ln -s /opt/postgres/datastore/pg_ident.conf /etc/postgres/pg_ident.conf
+RUN ln -s /opt/postgres/datastore/postgresql.conf /etc/container/configmap.d/postgresql.conf \
+ && ln -s /opt/postgres/datastore/pg_hba.conf /etc/container/configmap.d/pg_hba.conf \
+ && ln -s /opt/postgres/datastore/pg_ident.conf /etc/container/configmap.d/pg_ident.conf
 COPY 10-ep-container.sh /etc/container/entrypoint.d/10-ep-container.sh
 # COPY 10-ex-postgres.sh /etc/container/exitpoint.d/10-ex-postgres.sh
 
@@ -89,11 +89,6 @@ COPY 10-ep-container.sh /etc/container/entrypoint.d/10-ep-container.sh
 # │ SUDO               │
 # ╰――――――――――――――――――――╯
 # COPY wheel-chown /etc/container/wheel.d/wheel-chown
-
-# ╭――――――――――――――――――――╮
-# │ BACKUP             │
-# ╰――――――――――――――――――――╯
-COPY backup.fnc /etc/container/backup.d/backup.fnc
  
 # ╭――――――――――――――――――――╮
 # │ HEALTHCHECK        │
