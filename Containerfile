@@ -65,8 +65,8 @@ EXPOSE 8081/tcp
 # ╭――――――――――――――――――――╮
 # │ CONFIG             │
 # ╰――――――――――――――――――――╯
-RUN rm -rf /etc/postgres
-RUN ln -s /etc/container/configmap.d /etc/postgres
+RUN rm -rf /etc/$USER
+RUN ln -s /etc/container/configmap.d /etc/$USER
 
 # ╭――――――――――――――――――――╮
 # │ VERSION            │
@@ -99,7 +99,7 @@ COPY hc-pgweb.sh /etc/container/healthcheck.d/hc-pgweb.sh
 
 
 RUN /bin/mkdir -p /opt/$USER /run/postgresql /var/backup /opt/backup /temp/backup \
- && /bin/chown -R $USER:$USER /opt/$USER /etc/postgres /run/postgresql /var/backup /tmp/backup /opt/backup
+ && /bin/chown -R $USER:$USER /opt/$USER /etc/$USER /run/postgresql /var/backup /tmp/backup /opt/backup
  
 USER $USER
 WORKDIR /home/$USER
