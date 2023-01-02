@@ -1,0 +1,38 @@
+version: "3.9"
+services:
+  postgres:
+    build:
+      args:
+        ALPINE_VERSION: "latest"
+        POSTGRES_MAJOR: "15"
+        POSTGRES_MINOR: "1"
+        POSTGRES_RELEASE: "r0"
+        PGWEB_VERSION: "0.11.11"
+      context: .
+      dockerfile: Containerfile
+      no_cache: true
+      tags:
+        - "postgres:dev"
+    image: "postgres:dev"
+    ports:
+      - "8080:8080"
+      - "5432:5432"
+    volumes:
+      - "container:/mnt/volumes/container"
+      - "backup:/mnt/volumes/backup"
+        
+volumes:
+  container:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: /Users/mada/Workspace/postgres/container-volume
+  backup:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: /Users/mada/Workspace/postgres/backup-volume
+      
+

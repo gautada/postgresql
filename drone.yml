@@ -12,21 +12,22 @@ steps:
 - name: build
   environment:
     ALPINE_VERSION: 3.16.0
-    POSTGRES_VERSION: 14.3
+    POSTGRES_VERSION: 14.4
     PGWEB_VERSION: 0.11.11
   commands:
-  - podman build --build-arg ALPINE_VERSION=$ALPINE_VERSION --build-arg POSTGRES_VERSION=$POSTGRES_VERSION --file Containerfile --format docker --label revision="$(git rev-parse HEAD)" --label version="$(date +%Y.%m.%d)" --no-cache --tag postgres:build .
+  - podman build --build-arg ALPINE_VERSION=$ALPINE_VERSION --build-arg POSTGRES_VERSION=$POSTGRES_VERSION --build-arg PGWEB_VERSION=$PGWEB_VERSION --file Containerfile --format docker --label revision="$(git rev-parse HEAD)" --label version="$(date +%Y.%m.%d)" --no-cache --tag postgres:build .
 - name: publish
   environment:
-    POSTGRES_VERSION: 14.3
+    CONTAINER_NAME: "postgres"
+    CONTAINER_VERSION: 14.4
     DOCKERIO_USERNAME:
       from_secret: username.docker.io
     DOCKERIO_PASSWORD:
       from_secret: password.docker.io
   commands:
-   - podman tag postgres:build docker.io/gautada/postgres:$POSTGRES_VERSION
+   - podman tag postgres:build docker.io/gautada/$CONTAINER_NAME:$CONTAINER_VERSION
    - podman login --username=$DOCKERIO_USERNAME --password=$DOCKERIO_PASSWORD docker.io
-   - podman push docker.io/gautada/postgres:$POSTGRES_VERSION
+   - podman push docker.io/gautada/$CONTAINER_NAME:$CONTAINER_VERSION
   
 
 

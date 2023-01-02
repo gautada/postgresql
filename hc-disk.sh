@@ -3,7 +3,7 @@
 # Default health is zero which equals healthy
 HEALTH=0
 
-# Check - Disk Usage - Under 75% is helathy
+# Check - Disk Usage - Under 90% is helathy
 USAGE="$(df -h '/opt/postgres' | egrep -o '[0-9]+%')"
 USAGE="${USAGE%?}"
 MAX=90
