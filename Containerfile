@@ -2,7 +2,7 @@ ARG ALPINE_VERSION=3.14.1
 
 # ╭―――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――╮
 # │                                                                         │
-# │ STAGE 2: src-pgweb - Build pgweb from source                            │
+# │ STAGE: Build pgweb from source                                          │
 # │                                                                         │
 # ╰―――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――╯
 FROM gautada/alpine:$ALPINE_VERSION as src-pgweb
@@ -31,9 +31,9 @@ WORKDIR /pgweb
 RUN make build
 
 # ╭―――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――╮
-# │                                                                      │
-# │ STAGE 3: postgres-container                                          │
-# │                                                                      │
+# │                                                                     │
+# │ STAGE: Postgres container                                           │
+# │                                                                     │
 # ╰―――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――╯
 FROM gautada/alpine:$ALPINE_VERSION
 
@@ -45,63 +45,65 @@ LABEL maintainer="Adam Gautier <adam@gautier.org>"
 LABEL description="A postgres container with pgweb GUI"
 
 # ╭――――――――――――――――――――╮
-# │ USER               │
+# │ STANDARD CONFIG    │
 # ╰――――――――――――――――――――╯
+
+# USER:
+ARG USER=postgres
+
 ARG UID=1001
 ARG GID=1001
-ARG USER=postgres
 RUN /usr/sbin/addgroup -g $GID $USER \
  && /usr/sbin/adduser -D -G $USER -s /bin/ash -u $UID $USER \
  && /usr/sbin/usermod -aG wheel $USER \
  && /bin/echo "$USER:$USER" | chpasswd
- 
 
-# ╭――――――――――――――――――――╮
-# │ PORTS              │
-# ╰――――――――――――――――――――╯
-EXPOSE 5432/tcp
-EXPOSE 8081/tcp
+# PRIVILEGE:
+# COPY wheel  /etc/container/wheel
 
-# ╭――――――――――――――――――――╮
-# │ CONFIG             │
-# ╰――――――――――――――――――――╯
-RUN rm -rf /etc/$USER
-RUN ln -s /etc/container/configmap.d /etc/$USER
+# BACKUP:
+COPY backup /etc/container/backup
 
-# ╭――――――――――――――――――――╮
-# │ VERSION            │
-# ╰――――――――――――――――――――╯
-ARG POSTGRES_VERSION=14.3
-ARG POSTGRES_PACKAGE="$POSTGRES_VERSION"-r0
+# ENTRYPOINT:
+RUN rm -v /etc/container/entrypoint
+COPY entrypoint /etc/container/entrypoint
+
+# FOLDERS
+RUN /bin/chown -R $USER:$USER /mnt/volumes/container \
+ && /bin/chown -R $USER:$USER /mnt/volumes/backup \
+ && /bin/chown -R $USER:$USER /var/backup \
+ && /bin/chown -R $USER:$USER /tmp/backup
 
 # ╭――――――――――――――――――――╮
 # │ APPLICATION        │
 # ╰――――――――――――――――――――╯
-RUN /sbin/apk add --no-cache readline postgresql14=$POSTGRES_PACKAGE
+ARG POSTGRES_MAJOR="15"
+ARG POSTGRES_MINOR="1"
+ARG POSTGRES_RELEASE="r0"
+
+ARG POSTGRES_PACKAGE="postgresql$POSTGRES_MAJOR=$POSTGRES_MAJOR.$POSTGRES_MINOR-$POSTGRES_RELEASE"
+
+RUN /sbin/apk add --no-cache readline $POSTGRES_PACKAGE
 COPY --from=src-pgweb /pgweb/pgweb /usr/bin/pgweb
-RUN ln -s /opt/postgres/datastore/postgresql.conf /etc/container/configmap.d/postgresql.conf \
- && ln -s /opt/postgres/datastore/pg_hba.conf /etc/container/configmap.d/pg_hba.conf \
- && ln -s /opt/postgres/datastore/pg_ident.conf /etc/container/configmap.d/pg_ident.conf
-COPY 10-ep-container.sh /etc/container/entrypoint.d/10-ep-container.sh
-# COPY 10-ex-postgres.sh /etc/container/exitpoint.d/10-ex-postgres.sh
+
+RUN /bin/ln -fsv /mnt/volumes/configmaps/postgresql.conf /etc/container/postgresql.conf \
+ && /bin/ln -fsv /mnt/volumes/container/postgresql.conf /mnt/volumes/configmaps/postgresql.conf
+
+RUN /bin/ln -fsv /mnt/volumes/configmaps/pg_hba.conf /etc/container/pg_hba.conf \
+ && /bin/ln -fsv /mnt/volumes/container/pg_hba.conf /mnt/volumes/configmaps/pg_hba.conf
+
+RUN /bin/ln -fsv /mnt/volumes/configmaps/pg_ident.conf /etc/container/pg_ident.conf \
+ && /bin/ln -fsv /mnt/volumes/container/pg_ident.conf /mnt/volumes/configmaps/pg_ident.conf
+ 
+RUN /bin/mkdir -p /run/postgresql \
+ && /bin/chown -R $USER:$USER /run/postgresql
 
 # ╭――――――――――――――――――――╮
-# │ SUDO               │
+# │ CONTAINER          │
 # ╰――――――――――――――――――――╯
-# COPY wheel-chown /etc/container/wheel.d/wheel-chown
- 
-# ╭――――――――――――――――――――╮
-# │ HEALTHCHECK        │
-# ╰――――――――――――――――――――╯
-COPY hc-disk.sh /etc/container/healthcheck.d/hc-disk.sh
-COPY hc-postgres.sh /etc/container/healthcheck.d/hc-postgres.sh
-COPY hc-pgweb.sh /etc/container/healthcheck.d/hc-pgweb.sh
-
-
-RUN /bin/mkdir -p /opt/$USER /run/postgresql /var/backup /opt/backup /temp/backup \
- && /bin/chown -R $USER:$USER /opt/$USER /etc/$USER /run/postgresql /var/backup /tmp/backup /opt/backup
- 
 USER $USER
+VOLUME /mnt/volumes/backup
+VOLUME /mnt/volumes/configmaps
+VOLUME /mnt/volumes/container
+EXPOSE 8080/tcp 5432/tcp
 WORKDIR /home/$USER
-VOLUME /opt/$USER
-
