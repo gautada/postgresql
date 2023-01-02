@@ -11,15 +11,17 @@ platform:
 steps:
 - name: build
   environment:
-    ALPINE_VERSION: 3.16.0
-    POSTGRES_VERSION: 14.4
-    PGWEB_VERSION: 0.11.11
+    ALPINE_VERSION: "latest"
+    POSTGRES_MAJOR: "15"
+    POSTGRES_MINOR: "1"
+    POSTGRES_RELEASE: "r0"
+    PGWEB_VERSION: "0.11.11"
   commands:
   - podman build --build-arg ALPINE_VERSION=$ALPINE_VERSION --build-arg POSTGRES_VERSION=$POSTGRES_VERSION --build-arg PGWEB_VERSION=$PGWEB_VERSION --file Containerfile --format docker --label revision="$(git rev-parse HEAD)" --label version="$(date +%Y.%m.%d)" --no-cache --tag postgres:build .
 - name: publish
   environment:
     CONTAINER_NAME: "postgres"
-    CONTAINER_VERSION: 14.4
+    CONTAINER_VERSION: 15.1
     DOCKERIO_USERNAME:
       from_secret: username.docker.io
     DOCKERIO_PASSWORD:
