@@ -75,6 +75,7 @@ entrypoint_launch() {
  CONFIG=$4
  REDIRECT="/mnt/volumes/container/_log"
 
+ echo "[$PARAMS]"
  log "-i" "entrypoint" "Container Launch - $CONTAINER_NAME[$(container_version)]"
  if [ -z "$PARAMS" ] ; then
   ep_launch "$TEST" "$APPLICATION" "$CONFIG"
@@ -86,5 +87,11 @@ entrypoint_launch() {
 }
 
 ep_launch "postgres" "start_db" "$DB_DIR"
-entrypoint_launch $@ "pgweb" "start_app" "postgres"
-return $?
+REDIRECT="/mnt/volumes/container/_log" 
+if [ -z "$PARAMS" ] ; then
+ ep_launch "pgweb" "start_app" "postgres"
+ return 1
+else
+ ep_launch "pgweb" "start_app" "postgres" "$REDIRECT"
+return 0
+fi
