@@ -51,8 +51,8 @@ LABEL description="A postgres container with pgweb GUI"
 # USER:
 ARG USER=postgres
 
-ARG UID=1001
-ARG GID=1001
+ARG UID=1000
+ARG GID=1003
 RUN /usr/sbin/addgroup -g $GID $USER \
  && /usr/sbin/adduser -D -G $USER -s /bin/ash -u $UID $USER \
  && /usr/sbin/usermod -aG wheel $USER \
