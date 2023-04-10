@@ -1,8 +1,6 @@
 kind: pipeline
 type: exec
-name: Container Build - Postgres
-
-
+name: CI Container Build - PostgreSQL
 
 platform:
   os: linux
@@ -30,6 +28,8 @@ steps:
    - podman tag postgres:build docker.io/gautada/$CONTAINER_NAME:$CONTAINER_VERSION
    - podman login --username=$DOCKERIO_USERNAME --password=$DOCKERIO_PASSWORD docker.io
    - podman push docker.io/gautada/$CONTAINER_NAME:$CONTAINER_VERSION
-  
 
+trigger:
+  branch:
+  - main
 
