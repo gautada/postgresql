@@ -51,8 +51,8 @@ LABEL description="A postgres container with pgweb GUI"
 # USER:
 ARG USER=postgres
 
-ARG UID=1001
-ARG GID=1001
+ARG UID=1000
+ARG GID=1003
 RUN /usr/sbin/addgroup -g $GID $USER \
  && /usr/sbin/adduser -D -G $USER -s /bin/ash -u $UID $USER \
  && /usr/sbin/usermod -aG wheel $USER \
@@ -84,16 +84,18 @@ ARG POSTGRES_RELEASE="r0"
 ARG POSTGRES_PACKAGE="postgresql$POSTGRES_MAJOR=$POSTGRES_MAJOR.$POSTGRES_MINOR-$POSTGRES_RELEASE"
 
 RUN /sbin/apk add --no-cache readline $POSTGRES_PACKAGE
+RUN /sbin/apk add --no-cache py3-psycopg
+
 COPY --from=src-pgweb /pgweb/pgweb /usr/bin/pgweb
 
 RUN /bin/ln -fsv /mnt/volumes/configmaps/postgresql.conf /etc/container/postgresql.conf \
- && /bin/ln -fsv /mnt/volumes/container/postgresql.conf /mnt/volumes/configmaps/postgresql.conf
+ && /bin/ln -fsv /mnt/volumes/container/datastore/postgresql.conf~ /mnt/volumes/configmaps/postgresql.conf
 
 RUN /bin/ln -fsv /mnt/volumes/configmaps/pg_hba.conf /etc/container/pg_hba.conf \
- && /bin/ln -fsv /mnt/volumes/container/pg_hba.conf /mnt/volumes/configmaps/pg_hba.conf
+ && /bin/ln -fsv /mnt/volumes/container/datastore/pg_hba.conf~ /mnt/volumes/configmaps/pg_hba.conf
 
 RUN /bin/ln -fsv /mnt/volumes/configmaps/pg_ident.conf /etc/container/pg_ident.conf \
- && /bin/ln -fsv /mnt/volumes/container/pg_ident.conf /mnt/volumes/configmaps/pg_ident.conf
+ && /bin/ln -fsv /mnt/volumes/container/datastore/pg_ident.conf~ /mnt/volumes/configmaps/pg_ident.conf
  
 RUN /bin/mkdir -p /run/postgresql \
  && /bin/chown -R $USER:$USER /run/postgresql
