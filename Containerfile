@@ -80,10 +80,10 @@ RUN /bin/chown -R $USER:$USER /mnt/volumes/container \
 ARG POSTGRES_MAJOR="15"
 ARG POSTGRES_MINOR="1"
 ARG POSTGRES_RELEASE="r1"
+ARG POSTGRES="postgresql$POSTGRES_MAJOR"
+ARG POSTGRES_PACKAGE="$POSTGRES=$POSTGRES_MAJOR.$POSTGRES_MINOR-$POSTGRES_RELEASE"
 
-ARG POSTGRES_PACKAGE="postgresql$POSTGRES_MAJOR=$POSTGRES_MAJOR.$POSTGRES_MINOR-$POSTGRES_RELEASE"
-
-RUN /sbin/apk add --no-cache readline $POSTGRES_PACKAGE
+RUN /sbin/apk add --no-cache readline $POSTGRES
 RUN /sbin/apk add --no-cache py3-psycopg
 
 COPY --from=src-pgweb /pgweb/pgweb /usr/bin/pgweb
