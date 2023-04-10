@@ -1,6 +1,6 @@
 version: "3.9"
 services:
-  postgres:
+  postgresql:
     build:
       args:
         ALPINE_VERSION: "latest"
@@ -12,8 +12,8 @@ services:
       dockerfile: Containerfile
       no_cache: true
       tags:
-        - "postgres:dev"
-    image: "postgres:dev"
+        - "postgresql:dev"
+    image: "postgresql:dev"
     ports:
       - "8080:8080"
       - "5432:5432"
@@ -27,12 +27,12 @@ volumes:
     driver_opts:
       type: none
       o: bind
-      device: /Users/mada/Workspace/postgres/container-volume
+      device: /Users/mada/Workspace/postgresql/container-volume
   backup:
     driver: local
     driver_opts:
       type: none
       o: bind
-      device: /Users/mada/Workspace/postgres/backup-volume
+      device: /Users/mada/Workspace/postgresql/backup-volume
       
 
