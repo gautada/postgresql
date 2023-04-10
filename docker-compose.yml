@@ -6,8 +6,8 @@ services:
         ALPINE_VERSION: "latest"
         POSTGRES_MAJOR: "15"
         POSTGRES_MINOR: "2"
-        POSTGRES_RELEASE: "r0"
-        PGWEB_VERSION: "0.13.1"
+        POSTGRES_RELEASE: "r1"
+        PGWEB_VERSION: "0.14.0"
       context: .
       dockerfile: Containerfile
       no_cache: true
