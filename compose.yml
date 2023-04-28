@@ -4,6 +4,7 @@ services:
     build:
       args:
         ALPINE_VERSION: "latest"
+        CONTAINER_VERSION: "15.2"
         POSTGRES_MAJOR: "15"
         POSTGRES_MINOR: "2"
         POSTGRES_RELEASE: "r1"
@@ -12,8 +13,8 @@ services:
       dockerfile: Containerfile
       no_cache: true
       tags:
-        - "postgresql:dev"
-    image: "postgresql:dev"
+        - "postgresql:build"
+    image: "postgresql:build"
     ports:
       - "8080:8080"
       - "5432:5432"
