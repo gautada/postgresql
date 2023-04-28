@@ -14,7 +14,7 @@ services:
       no_cache: true
       tags:
         - "postgresql:build"
-    image: "postgresql:build"
+    image: "gautada/postgresql:build"
     ports:
       - "8080:8080"
       - "5432:5432"
