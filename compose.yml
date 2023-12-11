@@ -4,11 +4,11 @@ services:
     build:
       args:
         ALPINE_VERSION: "latest"
-        CONTAINER_VERSION: "15.2"
+        CONTAINER_VERSION: "15.5"
         POSTGRES_MAJOR: "15"
-        POSTGRES_MINOR: "2"
-        POSTGRES_RELEASE: "r1"
-        PGWEB_VERSION: "0.14.0"
+        POSTGRES_MINOR: "5"
+        POSTGRES_RELEASE: "r0"
+        PGWEB_VERSION: "0.14.2"
       context: .
       dockerfile: Containerfile
       no_cache: true

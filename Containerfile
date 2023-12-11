@@ -10,7 +10,7 @@ FROM gautada/alpine:$ALPINE_VERSION as src-pgweb
 # ╭――――――――――――――――――――╮
 # │ VERSION            │
 # ╰――――――――――――――――――――╯
-ARG PGWEB_VERSION=0.11.11
+ARG PGWEB_VERSION=0.14.2
 ARG PGWEB_BRANCH=v"$PGWEB_VERSION"
 
 # ╭――――――――――――――――――――╮
@@ -78,8 +78,8 @@ RUN /bin/chown -R $USER:$USER /mnt/volumes/container \
 # │ APPLICATION        │
 # ╰――――――――――――――――――――╯
 ARG POSTGRES_MAJOR="15"
-ARG POSTGRES_MINOR="1"
-ARG POSTGRES_RELEASE="r1"
+ARG POSTGRES_MINOR="5"
+ARG POSTGRES_RELEASE="r0"
 ARG POSTGRES="postgresql$POSTGRES_MAJOR"
 ARG POSTGRES_PACKAGE="$POSTGRES=$POSTGRES_MAJOR.$POSTGRES_MINOR-$POSTGRES_RELEASE"
 
