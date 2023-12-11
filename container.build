@@ -70,9 +70,10 @@ COPY entrypoint /etc/container/entrypoint
 
 # FOLDERS
 RUN /bin/chown -R $USER:$USER /mnt/volumes/container \
- && /bin/chown -R $USER:$USER /mnt/volumes/backup \
- && /bin/chown -R $USER:$USER /var/backup \
- && /bin/chown -R $USER:$USER /tmp/backup
+ && /bin/chown -R $USER:$USER /mnt/volumes/backup 
+ 
+ # && /bin/chown -R $USER:$USER /var/backup \
+ # && /bin/chown -R $USER:$USER /tmp/backup
 
 # ╭――――――――――――――――――――╮
 # │ APPLICATION        │
