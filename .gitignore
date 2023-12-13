@@ -21,3 +21,4 @@ manifest/
 # symlink to this files `ln -s .gitignore .dockerignore`
 .dockerignore
 
+.nova
