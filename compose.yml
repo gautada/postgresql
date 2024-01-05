@@ -8,7 +8,6 @@ services:
         POSTGRES_MAJOR: "15"
         POSTGRES_MINOR: "5"
         POSTGRES_RELEASE: "r0"
-        PGWEB_VERSION: "0.14.2"
       context: .
       dockerfile: container.build
       no_cache: true
@@ -17,7 +16,6 @@ services:
         - "gautada/postgresql:build"
     image: "postgresql:build"
     ports:
-      - "8080:8080"
       - "5432:5432"
     volumes:
       # - "/Users/mada/Workspace/Container:/mnt/volumes/container"
