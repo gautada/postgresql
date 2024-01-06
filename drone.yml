@@ -12,6 +12,7 @@ steps:
   commands:
   - /usr/bin/podman-compose build --no-cache
   - /usr/bin/podman images
+
 - name: test
   environment:
     DOCKERIO_USERNAME:

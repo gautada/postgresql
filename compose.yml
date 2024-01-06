@@ -4,36 +4,35 @@ services:
     build:
       args:
         ALPINE_VERSION: "latest"
-        CONTAINER_VERSION: "15.2"
+        CONTAINER_VERSION: "15.5"
         POSTGRES_MAJOR: "15"
-        POSTGRES_MINOR: "2"
-        POSTGRES_RELEASE: "r1"
-        PGWEB_VERSION: "0.14.0"
+        POSTGRES_MINOR: "5"
+        POSTGRES_RELEASE: "r0"
       context: .
-      dockerfile: Containerfile
+      dockerfile: container.build
       no_cache: true
       tags:
         - "postgresql:build"
-    image: "gautada/postgresql:build"
+        - "gautada/postgresql:build"
+    image: "postgresql:build"
     ports:
-      - "8080:8080"
       - "5432:5432"
     volumes:
-      - "container:/mnt/volumes/container"
-      - "backup:/mnt/volumes/backup"
-        
+      # - "/Users/mada/Workspace/Container:/mnt/volumes/container"
+      # - "/Users/mada/Workspace/Backup:/mnt/volumes/backup"
+      # - "/mnt/volumes/container/Workspace/Container:/mnt/volumes/container"
+      # - "/mnt/volumes/container/Workspace/Backup:/mnt/volumes/backup"
+      - "Container:/mnt/volumes/container"
+      - "Backup:/mnt/volumes/backup"
+
 volumes:
-  container:
-    driver: local
-    driver_opts:
-      type: none
-      o: bind
-      device: /Users/mada/Workspace/postgresql/container-volume
-  backup:
-    driver: local
-    driver_opts:
-      type: none
-      o: bind
-      device: /Users/mada/Workspace/postgresql/backup-volume
-      
+  Container:
+    external: true
+    name: "Container"
+
+  Backup:
+    external: true
+    name: "Backup"
+
+
 
