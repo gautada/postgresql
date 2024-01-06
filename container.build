@@ -15,6 +15,14 @@ LABEL description="A PostgreSQL database container"
 # │ STANDARD CONFIG    │
 # ╰――――――――――――――――――――╯
 
+# ╭――――――――――――――――――――╮
+# │ PRIVILEGE          │
+# ╰――――――――――――――――――――╯
+# COPY privileges /etc/container/privileges
+# RUN /bin/ln -fsv /etc/container/privileges /etc/sudoers.d/privileges \
+#   && /usr/sbin/groupadd --gid 99 privileged
+
+
 # USER:
 ARG USER=postgres
 
@@ -22,11 +30,9 @@ ARG UID=1000
 ARG GID=1003
 RUN /usr/sbin/addgroup -g $GID $USER \
  && /usr/sbin/adduser -D -G $USER -s /bin/ash -u $UID $USER \
- && /usr/sbin/usermod -aG wheel $USER \
+ && /usr/sbin/usermod -aG privileged $USER \
  && /bin/echo "$USER:$USER" | chpasswd
 
-# PRIVILEGE:
-# COPY wheel  /etc/container/wheel
 
 # BACKUP:
 COPY backup /etc/container/backup
