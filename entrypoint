@@ -12,9 +12,10 @@ ENTRYPOINT_PARAMS="$@"
 CONTAINER_NAME="postgres"
 DB_DIR="/mnt/volumes/container/datastore"
 
-app_entrypoint() {
+container_entrypoint() {
  if [ ! -d $DB_DIR ] ; then
   mkdir -p $DB_DIR
+  chown postgres:postgres $DB_DIR
   /usr/bin/pg_ctl init --pgdata=$DB_DIR
   /bin/mv $DB_DIR/postgresql.conf $DB_DIR/postgresql.conf~
   /bin/mv $DB_DIR/pg_hba.conf $DB_DIR/pg_hba.conf~
@@ -24,8 +25,10 @@ app_entrypoint() {
   /bin/ln -fsv /etc/container/postgresql.conf $DB_DIR/postgresql.conf
   unset $PGDATA
  fi
- /usr/bin/pg_ctl start --pgdata=$DB_DIR
- /usr/bin/pgweb --bind 0.0.0.0 --listen 8080 --host localhost --user postgres
+ # /usr/bin/pg_ctl start --pgdata=$DB_DIR
+ 
+ /usr/libexec/postgresql15/postgres -D $DB_DIR
+ # /usr/bin/pgweb --bind 0.0.0.0 --listen 8080 --host localhost --user postgres
 }
 
 container_version() {
@@ -33,12 +36,13 @@ container_version() {
 }
 
 start_db() {
- /usr/bin/pg_ctl start --pgdata=$1
+ # /usr/bin/pg_ctl start --pgdata=$1
+ /usr/libexec/postgresql15/postgres -D $1
 }
 
-start_app() {
- /usr/bin/pgweb --bind 0.0.0.0 --listen 8080 --host localhost --user $1
-}
+# start_app() {
+#  # /usr/bin/pgweb --bind 0.0.0.0 --listen 8080 --host localhost --user $1
+# }
 
 # ep_launch() {
 #  FG="FG"
