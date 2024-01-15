@@ -60,8 +60,6 @@ ARG POSTGRES_PACKAGE="$POSTGRES=$POSTGRES_MAJOR.$POSTGRES_MINOR-$POSTGRES_RELEAS
 RUN /sbin/apk add --no-cache readline $POSTGRES
 RUN /sbin/apk add --no-cache py3-psycopg
 
-COPY --from=src-pgweb /pgweb/pgweb /usr/bin/pgweb
-
 RUN /bin/ln -fsv /mnt/volumes/configmaps/postgresql.conf /etc/container/postgresql.conf 
 RUN /bin/ln -fsv /mnt/volumes/configmaps/pg_hba.conf /etc/container/pg_hba.conf
 RUN /bin/ln -fsv /mnt/volumes/configmaps/pg_ident.conf /etc/container/pg_ident.conf
