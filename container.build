@@ -51,7 +51,7 @@ RUN /bin/chown -R $USER:$USER /mnt/volumes/container \
 # ╭――――――――――――――――――――╮
 # │ APPLICATION        │
 # ╰――――――――――――――――――――╯
-ARG POSTGRES_MAJOR="15"
+ARG POSTGRES_MAJOR="15"`
 ARG POSTGRES_MINOR="5"
 ARG POSTGRES_RELEASE="r0"
 ARG POSTGRES="postgresql$POSTGRES_MAJOR"
@@ -60,14 +60,19 @@ ARG POSTGRES_PACKAGE="$POSTGRES=$POSTGRES_MAJOR.$POSTGRES_MINOR-$POSTGRES_RELEAS
 RUN /sbin/apk add --no-cache readline $POSTGRES
 RUN /sbin/apk add --no-cache py3-psycopg
 
-RUN /bin/ln -fsv /mnt/volumes/configmaps/postgresql.conf /etc/container/postgresql.conf \
- && /bin/ln -fsv /mnt/volumes/container/datastore/postgresql.conf~ /mnt/volumes/configmaps/postgresql.conf
+COPY --from=src-pgweb /pgweb/pgweb /usr/bin/pgweb
 
-RUN /bin/ln -fsv /mnt/volumes/configmaps/pg_hba.conf /etc/container/pg_hba.conf \
- && /bin/ln -fsv /mnt/volumes/container/datastore/pg_hba.conf~ /mnt/volumes/configmaps/pg_hba.conf
-
-RUN /bin/ln -fsv /mnt/volumes/configmaps/pg_ident.conf /etc/container/pg_ident.conf \
- && /bin/ln -fsv /mnt/volumes/container/datastore/pg_ident.conf~ /mnt/volumes/configmaps/pg_ident.conf
+RUN /bin/ln -fsv /mnt/volumes/configmaps/postgresql.conf /etc/container/postgresql.conf 
+RUN /bin/ln -fsv /mnt/volumes/configmaps/pg_hba.conf /etc/container/pg_hba.conf
+RUN /bin/ln -fsv /mnt/volumes/configmaps/pg_ident.conf /etc/container/pg_ident.conf
+# \
+#  && /bin/ln -fsv /mnt/volumes/container/datastore/postgresql.conf~ /mnt/volumes/configmaps/postgresql.conf
+# 
+# RUN /bin/ln -fsv /mnt/volumes/configmaps/pg_hba.conf /etc/container/pg_hba.conf \
+#  && /bin/ln -fsv /mnt/volumes/container/datastore/pg_hba.conf~ /mnt/volumes/configmaps/pg_hba.conf
+# 
+# RUN /bin/ln -fsv /mnt/volumes/configmaps/pg_ident.conf /etc/container/pg_ident.conf \
+#  && /bin/ln -fsv /mnt/volumes/container/datastore/pg_ident.conf~ /mnt/volumes/configmaps/pg_ident.conf
  
 RUN /bin/mkdir -p /run/postgresql \
  && /bin/chown -R $USER:$USER /run/postgresql

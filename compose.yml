@@ -4,9 +4,9 @@ services:
     build:
       args:
         ALPINE_VERSION: "latest"
-        CONTAINER_VERSION: "15.5"
-        POSTGRES_MAJOR: "15"
-        POSTGRES_MINOR: "5"
+        CONTAINER_VERSION: "16.1"
+        POSTGRES_MAJOR: "16"
+        POSTGRES_MINOR: "1"
         POSTGRES_RELEASE: "r0"
       context: .
       dockerfile: container.build
@@ -18,12 +18,10 @@ services:
     ports:
       - "5432:5432"
     volumes:
-      # - "/Users/mada/Workspace/Container:/mnt/volumes/container"
-      # - "/Users/mada/Workspace/Backup:/mnt/volumes/backup"
-      # - "/mnt/volumes/container/Workspace/Container:/mnt/volumes/container"
-      # - "/mnt/volumes/container/Workspace/Backup:/mnt/volumes/backup"
       - "Container:/mnt/volumes/container"
       - "Backup:/mnt/volumes/backup"
+      - "Configmaps:/mnt/volumes/configmaps"
+      - "Secrets:/mnt/volumes/Secrets"
 
 volumes:
   Container:
@@ -34,5 +32,11 @@ volumes:
     external: true
     name: "Backup"
 
-
+  Configmaps:
+    external: true
+    name: "Configmaps"
+    
+  Secrets:
+    external: true
+    name: "Secrets"
 
