@@ -13,3 +13,5 @@
 - [Distribution packages was chosen over building from source](https://www.linuxquestions.org/questions/linux-newbie-8/advantages-and-disadvantages-of-source-over-compiled-packages-839437/) & [Deployment from code vs deployment packages](https://www.rpmdeb.com/devops-articles/deployment-from-code-vs-deployment-packages/)
 - [The DevOps Guy - Postgres play list](https://www.youtube.com/playlist?list=PLHq1uqvAteVsnMSMVp-Tcb0MSBVKQ7GLg)
 
+
+(ff)
