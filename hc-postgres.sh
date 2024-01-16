@@ -31,5 +31,9 @@ if [ $? -eq 1 ] ; then
  HEALTH=1
 fi
 
+
+# CREATE TABLE customers (firstname text);
+# INSERT INTO customer (firstname) VALUES ('Bob Smith');
+
 return $HEALTH
 

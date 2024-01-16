@@ -10,10 +10,11 @@ ENTRYPOINT_PARAMS="$@"
 . /etc/profile
 
 CONTAINER_NAME="postgres"
-DB_DIR="/mnt/volumes/container/postgresql-data-cluster"
-
+DB_DIR="/mnt/volumes/container/pgdata/cluster"
+ARCHIVE_DIR="/mnt/volumes/container/pgdata/archive"
 container_entrypoint() {
  if [ ! -d $DB_DIR ] ; then
+  /bin/mkdir -p $ARCHIVE_DIR
   /usr/bin/initdb $DB_DIR
   unset $PGDATA
  fi
