@@ -1,4 +1,4 @@
-#!/bin/ash
+mv#!/bin/ash
 #
 # entrypoint: Located at `/etc/container/entrypoint` this script is the custom
 #             entry for a container as called by `/usr/bin/container-entrypoint` set
@@ -10,96 +10,18 @@ ENTRYPOINT_PARAMS="$@"
 . /etc/profile
 
 CONTAINER_NAME="postgres"
-DB_DIR="/mnt/volumes/container/datastore"
-
+DB_DIR="/mnt/volumes/container/pgdata/cluster"
+ARCHIVE_DIR="/mnt/volumes/container/pgdata/archive"
 container_entrypoint() {
  if [ ! -d $DB_DIR ] ; then
-  mkdir -p $DB_DIR
-  chown postgres:postgres $DB_DIR
-  /usr/bin/pg_ctl init --pgdata=$DB_DIR
-  /bin/mv $DB_DIR/postgresql.conf $DB_DIR/postgresql.conf~
-  /bin/mv $DB_DIR/pg_hba.conf $DB_DIR/pg_hba.conf~
-  /bin/mv $DB_DIR/pg_ident.conf $DB_DIR/pg_ident.conf~
-  /bin/ln -fsv /etc/container/pg_ident.conf $DB_DIR/pg_ident.conf
-  /bin/ln -fsv /etc/container/pg_hba.conf $DB_DIR/pg_hba.conf
-  /bin/ln -fsv /etc/container/postgresql.conf $DB_DIR/postgresql.conf
+  /bin/mkdir -p $ARCHIVE_DIR
+  /usr/bin/initdb $DB_DIR
   unset $PGDATA
  fi
- # /usr/bin/pg_ctl start --pgdata=$DB_DIR
- 
- /usr/libexec/postgresql15/postgres -D $DB_DIR
- # /usr/bin/pgweb --bind 0.0.0.0 --listen 8080 --host localhost --user postgres
+ /usr/bin/postgres --config-file=/etc/container/postgresql.conf
+ # -D $DB_DIR
 }
 
 container_version() {
  /usr/bin/postgres --version | awk -F ' ' '{print $3}'
 }
-
-start_db() {
- # /usr/bin/pg_ctl start --pgdata=$1
- /usr/libexec/postgresql15/postgres -D $1
-}
-
-# start_app() {
-#  # /usr/bin/pgweb --bind 0.0.0.0 --listen 8080 --host localhost --user $1
-# }
-
-# ep_launch() {
-#  FG="FG"
-#  BG="BG"
-#   
-#  TEST=$1
-#  APPLICATION=$2
-#  CONFIG=$3
-#  REDIRECT=$4
-# 
-#  # echo "$TEST $APPLICATION $CONFIG $REDIRECT"
-#   
-#  TYPE="$FG"
-#  if [ ! -z $REDIRECT ] ; then
-#   TYPE="$BG"
-#  fi
-#  log "-i" "entrypoint" "Testing - $TEST"
-#  /usr/bin/pgrep $TEST > /dev/null
-#  _T=$?
-#  if [ 1 -eq $_T ] ; then
-#   log "-i" "entrypoint" "$TYPE Launch - $APPLICATION"
-#   log "-i" "entrypoint" "--Config - $CONFIG"
-#   if [ "$TYPE" == "$BG" ] ; then
-#    log "-i" "entrypoint" "--Background - $REDIRECT"
-#    "$APPLICATION" "$CONFIG" > "$REDIRECT" 2>&1 &
-#    else
-#     "$APPLICATION" "$CONFIG"
-#    fi
-#  else
-#   log "-i" "entrypoint" "Test Failure - $TEST failed pgrep test"
-#  fi
-# }
-# 
-# entrypoint_launch() {
-#  PARAMS=$1
-#  TEST=$2
-#  APPLICATION=$3
-#  CONFIG=$4
-#  REDIRECT="/mnt/volumes/container/_log"
-# 
-#  echo "[$PARAMS]"
-#  log "-i" "entrypoint" "Container Launch - $CONTAINER_NAME[$(container_version)]"
-#  if [ -z "$PARAMS" ] ; then
-#   ep_launch "$TEST" "$APPLICATION" "$CONFIG"
-#   return 1
-#  else
-#   ep_launch "$TEST" "$APPLICATION" "$CONFIG" "$REDIRECT"
-#   return 0
-#  fi
-# }
-
-# ep_launch "postgres" "start_db" "$DB_DIR"
-# REDIRECT="/mnt/volumes/container/_log" 
-# if [ -z "$PARAMS" ] ; then
-#  ep_launch "pgweb" "start_app" "postgres"
-#  return 1
-# else
-#  ep_launch "pgweb" "start_app" "postgres" "$REDIRECT"
-# return 0
-# fi
