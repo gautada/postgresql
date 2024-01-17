@@ -22,7 +22,7 @@ services:
       - "Container:/mnt/volumes/container"
       - "Backup:/mnt/volumes/backup"
       - "Configmaps:/mnt/volumes/configmaps"
-      - "Secrets:/mnt/volumes/Secrets"
+      - "Secrets:/mnt/volumes/secrets"
 
 volumes:
   Container:
