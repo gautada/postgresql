@@ -39,7 +39,7 @@ ARG POSTGRES_RELEASE="r0"
 ARG POSTGRES="postgresql$POSTGRES_MAJOR"
 ARG POSTGRES_PACKAGE="$POSTGRES=$POSTGRES_MAJOR.$POSTGRES_MINOR-$POSTGRES_RELEASE"
 
-RUN /sbin/apk add --no-cache readline $POSTGRES
+RUN /sbin/apk add --no-cache readline $POSTGRES postgresql$POSTGRES_MAJOR-contrib
 RUN /sbin/apk add --no-cache py3-psycopg
 
 RUN /bin/ln -fsv /mnt/volumes/configmaps/postgresql.conf /etc/container/postgresql.conf 
