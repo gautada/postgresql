@@ -12,12 +12,18 @@ ENTRYPOINT_PARAMS="$@"
 CONTAINER_NAME="postgres"
 DB_DIR="/mnt/volumes/container/pgdata/cluster"
 ARCHIVE_DIR="/mnt/volumes/container/pgdata/archive"
+
 container_entrypoint() {
  if [ ! -d $DB_DIR ] ; then
   /bin/mkdir -p $ARCHIVE_DIR
   /usr/bin/initdb $DB_DIR
   unset $PGDATA
  fi
+ mkdir /home/postgres/.tls
+ /bin/cp /mnt/volumes/secrets/tls.key /home/postgres/.tls/tls.key
+ /bin/cp /mnt/volumes/secrets/tls.crt /home/postgres/.tls/tls.crt
+ /bin/chmod 0600 /home/postgres/.tls/tls.key
+ /bin/chmod 0600 /home/postgres/.tls/tls.crt
  /usr/bin/postgres --config-file=/etc/container/postgresql.conf
  # -D $DB_DIR
 }
