@@ -51,5 +51,5 @@ openssl req -new -nodes -text -out root.csr \
 - Check that the server is up and running: ```/usr/bin/psql -c "SELECT pg_reload_conf();"```
 - [Distribution packages was chosen over building from source](https://www.linuxquestions.org/questions/linux-newbie-8/advantages-and-disadvantages-of-source-over-compiled-packages-839437/) & [Deployment from code vs deployment packages](https://www.rpmdeb.com/devops-articles/deployment-from-code-vs-deployment-packages/)
 - [The DevOps Guy - Postgres play list](https://www.youtube.com/playlist?list=PLHq1uqvAteVsnMSMVp-Tcb0MSBVKQ7GLg)
-
+- 2024-01-25 - Added and [enabled](https://dba.stackexchange.com/questions/165300/how-to-install-the-additional-module-pg-trgm) the pg_trgm extension (support for similarity of text using trigram matching) used in the tandoor-container.
 
