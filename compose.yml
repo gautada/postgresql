@@ -16,8 +16,6 @@ services:
         - "gautada/postgresql:build"
         - "gautada/postgresql:latest"
     image: "gautada/postgresql:latest"
-    environment:
-    - ABC=${XYZ}
     ports:
       - "5432:5432"
     volumes:
