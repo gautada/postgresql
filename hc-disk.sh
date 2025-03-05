@@ -1,4 +1,4 @@
-#!/bin/ash
+#!/bin/sh
 
 # Default health is zero which equals healthy
 HEALTH=0
