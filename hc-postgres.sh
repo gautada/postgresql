@@ -4,18 +4,15 @@
 HEALTH=0
 
 # Check #1 - Postgres is running
-TEST="$(/usr/bin/pgrep postgres)"
-if [ $? -eq 1 ] ; then
+if /usr/bin/pgrep postgres ; then
  HEALTH=1
 fi
 # Check #2a - Postgres isready
-TEST="$(/usr/bin/pg_isready)"
-if [ ! $? -eq 0 ] ; then
+if ! /usr/bin/pg_isready ; then
  HEALTH=1
 fi
 # Check #2b - Postgres isready TCP
-TEST="$(/usr/bin/pg_isready --host 127.0.0.1)"
-if [ ! $? -eq 0 ] ; then
+if /usr/bin/pg_isready --host 127.0.0.1 ; then
  HEALTH=1
 fi
 
@@ -26,14 +23,11 @@ fi
 # fi
 
 # Check #3 - A psql client can connect
-TEST=$(/usr/bin/psql -c "SELECT datname FROM pg_database;")
-if [ $? -eq 1 ] ; then
+if /usr/bin/psql -c "SELECT datname FROM pg_database;") ; then
  HEALTH=1
 fi
 
-
 # CREATE TABLE customers (firstname text);
 # INSERT INTO customer (firstname) VALUES ('Bob Smith');
-
 return $HEALTH
 
