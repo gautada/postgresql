@@ -23,7 +23,7 @@ fi
 # fi
 
 # Check #3 - A psql client can connect
-if /usr/bin/psql -c "SELECT datname FROM pg_database;") ; then
+if /usr/bin/psql -c "SELECT datname FROM pg_database;" ; then
  HEALTH=1
 fi
 
