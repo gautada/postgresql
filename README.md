@@ -1,10 +1,35 @@
 # PostgeSQL
 
-[PostgreSQL](https://www.postgresql.org) PostgreSQL is a powerful, open source object-relational database system with over 30 years of active development that has earned it a strong reputation for reliability, feature robustness, and performance.
+[PostgreSQL](https://www.postgresql.org) PostgreSQL is a powerful, open 
+source object-relational database system with over 30 years of active 
+development that has earned it a strong reputation for reliability, 
+feature robustness, and performance.
 
-## Container
+## Version
 
-To get the container up and running you must provide your own `pg_hba.conf`, `pg_ident.conf` and `postgresql.conf`.  The default config files from version 16 are attached in this project (comments removed) but you should override deployment config with configmaps.
+Currently this image is based on 
+[PostgreSQL 15](https://www.postgresql.org/docs/15/index.html). Check 
+the specific version of the [package](https://pkgs.alpinelinux.org/packages?name=postgresql15&branch=v3.21&repo=community&arch=aarch64&origin=&flagged=&maintainer=) in the Alpine Packages Repository.
+
+## Configuration
+
+To get the container up and running you must provide your own `pg_hba.conf`,
+ `pg_ident.conf` and `postgresql.conf`.  The default config files from 
+ version 15 are attached in this project (comments removed) but you should 
+ override deployment configuration via configmaps.
+ 
+ - **pg_hba.conf**:  (PostgreSQL Host-Based Authentication) file is a 
+ configuration file used by PostgreSQL to control client authentication. 
+ It defines which users can connect, from where, using which authentication 
+ method.
+ - **pg_ident.conf**: is used for user name mapping 
+ between external authentication systems (such as OS users or Kerberos) and 
+ PostgreSQL database users. It is mainly used when authentication methods like 
+ peer, ident, or gss require mapping between system usernames and database 
+ roles.
+ - **postgresql.conf**: is the main configuration file for PostgreSQL. It 
+ controls server behavior, resource usage, logging, networking, 
+ and performance tuning.
 
 ## SSL/TLS
 
@@ -13,26 +38,27 @@ TLS support is enabled by default. To to setup for testing use a self-signed cer
 ### Create Self-Signed Certificate
 
 - Create the certificate authority root key
-```
+```sh
 openssl req -new -nodes -text -out root.csr \
             -keyout root.key -subj "/CN=psq.gautier.org"
 ```
  
--  Sign the root certificate signing request  to create the root certificate (Note: the extfile path is for macOS)
- ```
+-  Sign the root certificate signing request  to create the root certificate 
+(Note: the extfile path is for macOS)
+ ```sh
  openssl x509 -req -in root.csr -text -days 3650 \
   -extfile /System/Library/OpenSSL/openssl.cnf  \
   -extensions v3_ca -signkey root.key -out root.crt
  ```
  
  - Generate the `server.key` file and the `server.csr`
- ```
+ ```sh
  openssl req -new -nodes -text -out server.csr \
   -keyout server.key -subj "/CN=psql.gautier.org"
  ```
  
  - Finally generate the `server.crt`
- ```
+ ```sh
  openssl x509 -req  -in server.csr -text -days 3650 \
    -CA root.crt -CAkey root.key -CAcreateserial \
    -out server.crt
