@@ -5,10 +5,11 @@ on:
   push:
     branches:
       - dev
-    pull_request:
-     branches:
-       - main
+  pull_request:
+    branches:
+      - main
 
+env:
   IMAGE_NAME: "postgresql"
   IMAGE_VERSION: "15.11-r0"
   ALPINE_VERSION: "3.21.2"
