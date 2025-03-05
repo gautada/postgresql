@@ -26,6 +26,7 @@ LABEL org.opencontainers.image.license="Upstream"
 # │ USER
 # ╰――――――――――――――――――――
 ARG USER=postgres
+SHELL ["/bin/ash", "-o", "pipefail", "-c"]
 RUN /usr/sbin/usermod -l $USER alpine \
  && /usr/sbin/usermod -d /home/$USER -m $USER \
  && /usr/sbin/groupmod -n $USER alpine \

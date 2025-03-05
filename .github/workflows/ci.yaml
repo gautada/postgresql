@@ -3,13 +3,12 @@ name: "Continuous integration to the container registry"
 
 on:
   push:
-   branches:
-     - dev
-  pull_request:
     branches:
-      - main
+      - dev
+    pull_request:
+     branches:
+       - main
 
-env:
   IMAGE_NAME: "postgresql"
   IMAGE_VERSION: "15.11-r0"
   ALPINE_VERSION: "3.21.2"
@@ -79,4 +78,3 @@ jobs:
           IMG="$IMG:${{ env.IMAGE_TAG_PROD }}"
           /usr/bin/podman tag "$S_IMG" "$IMG"
           /usr/bin/podman push "$IMG"
-
