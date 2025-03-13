@@ -28,3 +28,6 @@ roles.
 - **postgresql.conf**: is the main configuration file for PostgreSQL. It
 controls server behavior, resource usage, logging, networking,
 and performance tuning.
+
+### TLS Setup
+
