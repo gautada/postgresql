@@ -40,7 +40,8 @@ COPY backup /etc/container/backup
 # ╭―
 # │ ENTRYPOINT
 # ╰――――――――――――――――――――
-COPY entrypoint.sh /etc/container/entrypoint
+# Overwrite upstream entrypoint
+COPY entrypoint.sh /usr/bin/container-entrypoint
 
 # ╭――――――――――――――――――――╮
 # │ APPLICATION        │
