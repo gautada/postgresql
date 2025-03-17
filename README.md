@@ -42,3 +42,4 @@ and performance tuning.
 ## Notes
 
 - [Postgresql Video Series](https://www.youtube.com/playlist?list=PLHq1uqvAteVsnMSMVp-Tcb0MSBVKQ7GLg)
+with supporting [materials](https://github.com/marcel-dempers/docker-development-youtube-series)
