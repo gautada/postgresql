@@ -1,16 +1,24 @@
 # PostgeSQL
+
 [PostgreSQL](https://www.postgresql.org) PostgreSQL is a powerful, open
 source object-relational database system with over 30 years of active
 development that has earned it a strong reputation for reliability,
 feature robustness, and performance.
 
+This image package is called `postgresql`. The server name will be
+`postgres.domain.tld`.  This is in view of the long standing
+[naming issue](https://wiki.postgresql.org/wiki/Postgres) that is known
+within the community.
+
 ## Version
+
 Currently this image is based on
 [PostgreSQL 15](https://www.postgresql.org/docs/15/index.html). Check
 the specific version of the [package](https://pkgs.alpinelinux.org/packages?name=postgresql15&branch=v3.21&repo=community&arch=aarch64&origin=&flagged=&maintainer=)
 in the Alpine Packages Repository.
 
 ## Configuration
+
 To get the container up and running you must provide your own `pg_hba.conf`,
 `pg_ident.conf` and `postgresql.conf`.  The default config files from
 version 15 are attached in this project (comments removed) but you should
@@ -31,3 +39,6 @@ and performance tuning.
 
 ### TLS Setup
 
+## Notes
+
+- [Postgresql Video Series](https://www.youtube.com/playlist?list=PLHq1uqvAteVsnMSMVp-Tcb0MSBVKQ7GLg)
