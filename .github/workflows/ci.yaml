@@ -49,8 +49,8 @@ jobs:
             --password-stdin docker.io
 
       - name: "Build Container Image for aarch64 using Podman"
+        # There must be a line at the end of the .env file
         run: |
-          echo "${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG_DEV }}"
           /usr/bin/podman build \
            --arch aarch64 \
            --build-arg-file .arg \
