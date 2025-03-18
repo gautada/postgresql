@@ -52,8 +52,7 @@ jobs:
         run: |
           /usr/bin/podman build \
            --arch aarch64 \
-           --build-arg "IMAGE_VERSION=${{ env.IMAGE_VERSION }}" \
-           --build-arg "ALPINE_VERSION=${{ env.ALPINE_VERSION }}" \
+           --build-arg-file=.arg \
            --file Containerfile \
            --no-cache \
            --tag "${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG_DEV }}" \
