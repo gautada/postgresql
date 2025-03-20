@@ -18,9 +18,9 @@ if [ ! -d "${DB_DIR}" ] ; then
 fi
 
 CONFIG_FILE="${POSTGRESQL_CONFIG_FILE:-/etc/container/postgresql.conf}"
-echo "${CONFIG_FILE}"
-# /usr/bin/postgres --config-file="${CONFIG_FILE}" -D "${DB_DIR}"
-tail -f /dev/null
+# echo "${CONFIG_FILE}"
+/usr/bin/postgres --config-file="${CONFIG_FILE}" -D "${DB_DIR}"
+# tail -f /dev/null
 #  mkdir /home/postgres/.tls
 #  /bin/cp /mnt/volumes/secrets/tls.key /home/postgres/.tls/tls.key
 #  /bin/cp /mnt/volumes/secrets/tls.crt /home/postgres/.tls/tls.crt
