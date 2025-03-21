@@ -37,6 +37,46 @@ roles.
 controls server behavior, resource usage, logging, networking,
 and performance tuning.
 
+## Databases
+
+### Lists databases
+
+To list all of the database on the server use `\list`
+## Users
+
+### List users
+
+To list all of the user on the server use `\du`.
+
+### Encrypted passwords
+
+#### Enable encrypted passwords
+
+In the `postgresql.conf` file enable encrypted password by added `password_encryption = scram-sha-256`.
+
+#### Set a user password
+
+```
+ALTER USER myuser WITH ENCRYPTED PASSWORD 'mypassword';
+```
+
+#### Check a user has password set
+
+```
+SELECT rolname, rolpassword FROM pg_authid WHERE rolname = 'myuser';
+```
+
+#### Change database owner;
+
+```
+ALTER DATABASE mydb OWNER TO newuser;
+```
+
+#### Rename existing user
+
+```
+ALTER ROLE test RENAME to test;
+```
 ### TLS Setup
 
 ## Notes
