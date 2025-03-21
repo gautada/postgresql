@@ -56,13 +56,13 @@ In the `postgresql.conf` file enable encrypted password by added `password_encry
 
 #### Set a user password
 
-```
+```sql
 ALTER USER myuser WITH ENCRYPTED PASSWORD 'mypassword';
 ```
 
 #### Check a user has password set
 
-```
+```sql
 SELECT rolname, rolpassword FROM pg_authid WHERE rolname = 'myuser';
 ```
 
