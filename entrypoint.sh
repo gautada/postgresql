@@ -41,6 +41,7 @@ if [ "${PG_TYPE}" = "MASTER" ]; then
    mv "${BACKUP_FILE}" "${BACKUP_FILE}~"
   else
    echo "[WARN] Recover from standby: @to-do: read standby pg_basebackup"
+   pg_basebackup --help
    echo "${REPLICA_HOST}"
    echo "${REPLICA_PORT}"
    echo "${REPLICA_DB}"
