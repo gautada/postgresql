@@ -25,4 +25,4 @@ manifest/
 _containers
 .env
 
-
+_*

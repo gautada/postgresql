@@ -2,31 +2,63 @@
 #
 # entrypoint: OVerloaded entrypoint. Just run the postgresql server
 
-DB_DIR="${POSTGRESQL_DATA_DIRECTORY:-/home/postgres/pgdata}"
-if [ ! -d "${DB_DIR}" ] ; then
- echo "Initialize database directory --- ${DB_DIR}"
- /usr/bin/initdb "${DB_DIR}"
- pg_ctl -D "${DB_DIR}" start
- BACKUP_FILE="${POSTGRESQL_BACKUP_FILE:-/mnt/volumes/container/postgresql.sql}"
- if [ -f "${BACKUP_FILE}" ] ; then
-  echo "Restoring database from file --- ${BACKUP_FILE}"
-  psql -U postgres -f "${BACKUP_FILE}"
- else
-  echo "[WARN] Backup database file (${BACKUP_FILE}) is not available"
- fi
- pg_ctl -D "${DB_DIR}" stop
-fi
+# STEPS
+# Determine if master or replica
+# IF Master?
+# - IF there is a backup file then load the backup file to a minimal config
+# - Check if there are replicas, if yes fail.
+# - If no replicas then launch master from backup and archive backup.
+# ELSE
+# - Replicate from replica 
+# - Launch master (replicas should kick-in
+# ELSE Replica
+# - check replica: SELECT pg_is_in_recovery(); Returns true → This is a replica.
+# - pg_basebackup
+# - constant replicate
 
+PG_TYPE=$(echo "${POSTGRESQL_SERVER_TYPE:-master}" | tr '[:lower:]' '[:upper:]')
+DATA_DIR="${POSTGRESQL_DATA_DIRECTORY:-/home/postgres/pgdata}"
+BACKUP_FILE="${POSTGRESQL_BACKUP_FILE:-/mnt/volumes/container/postgresql.sql}"
+REPLICA_HOST="${POSTGRESQL_REPLICA_HOST:-svc.foo.postgresql-replica}"
+REPLICA_PORT="${POSTGRESQL_REPLICA_PORT:-5432}"
+REPLICA_DB="${POSTGRESQL_REPLICA_DATABASE:-db}"
+REPLICA_USER="${POSTGRESQL_REPLICA_USER:-user}"
+REPLICA_PWD="${POSTGRESQL_REPLICA_USER:-pwd}"
+export ARCHIVE_DIR="${POSTGRESQL_ARCHIVE_DIRECTORY:-/home/postgres/archive}"
 CONFIG_FILE="${POSTGRESQL_CONFIG_FILE:-/etc/container/postgresql.conf}"
-# echo "${CONFIG_FILE}"
-/usr/bin/postgres --config-file="${CONFIG_FILE}" -D "${DB_DIR}"
-# tail -f /dev/null
-#  mkdir /home/postgres/.tls
-#  /bin/cp /mnt/volumes/secrets/tls.key /home/postgres/.tls/tls.key
-#  /bin/cp /mnt/volumes/secrets/tls.crt /home/postgres/.tls/tls.crt
-#  /bin/chmod 0600 /home/postgres/.tls/tls.key
-#  /bin/chmod 0600 /home/postgres/.tls/tls.crt
-#
-# container_version() {
-#  /usr/bin/postgres --version | awk -F ' ' '{print $3}'
-#}
+
+if [ "${PG_TYPE}" = "MASTER" ]; then
+ if [ -d "${DATA_DIR}" ] ; then
+  echo "[INFO] Existing data directory: ${DATA_DIR}" >&2
+ else
+  if [ -f "${BACKUP_FILE}" ] ; then
+   echo "[INFO] Recover from backup file: ${BACKUP_FILE}"
+   echo "[INFO] Initialize database directory: ${DATA_DIR}"
+   /usr/bin/initdb "${DATA_DIR}"
+   pg_ctl -D "${DATA_DIR}" start
+   psql -U postgres -f "${BACKUP_FILE}"
+   pg_ctl -D "${DATA_DIR}" stop
+   mv "${BACKUP_FILE}" "${BACKUP_FILE}~"
+  else
+   echo "[WARN] Recover from standby: @to-do: read standby pg_basebackup"
+   echo "${REPLICA_HOST}"
+   echo "${REPLICA_PORT}"
+   echo "${REPLICA_DB}"
+   echo "${REPLICA_USER}"
+   echo "${REPLICA_PWD}"
+  fi
+ fi 
+elif [ "${PG_TYPE}" = "REPLICA" ]; then
+ echo "[WARN] Establish standby: @to-do read primary pg_basebackup"
+else
+ echo "[ERROR] Uknown server type(${PG_TYPE})"
+ exit 1
+fi
+if [ ! -d "${DATA_DIR}" ] ; then
+ echo "[ERROR] No data directory: ${DATA_DIR}" >&2
+ exit 2
+fi
+echo "[INFO] Start server ..."
+echo "[INFO] ... with configuration: ${CONFIG_FILE}"
+echo "[INFO] ... with data directory: ${DATA_DIR}"
+/usr/bin/postgres --config-file="${CONFIG_FILE}" -D "${DATA_DIR}"
