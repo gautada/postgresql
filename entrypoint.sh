@@ -54,10 +54,20 @@ else
  echo "[ERROR] Uknown server type(${PG_TYPE})"
  exit 1
 fi
+
+
+# -----------------------------------------------------------------------------
+# Start Server
+
 if [ ! -d "${DATA_DIR}" ] ; then
  echo "[ERROR] No data directory: ${DATA_DIR}" >&2
  exit 2
 fi
+
+if [ ! -d "${ARCHIVE_DIR}" ] ; then
+ echo "[INFO] Setup archive directory: ${ARCHIVE_DIR}"
+fi
+
 echo "[INFO] Start server ..."
 echo "[INFO] ... with configuration: ${CONFIG_FILE}"
 echo "[INFO] ... with data directory: ${DATA_DIR}"
