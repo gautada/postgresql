@@ -93,3 +93,39 @@ ALTER ROLE test RENAME to test;
 
 - [Postgresql Video Series](https://www.youtube.com/playlist?list=PLHq1uqvAteVsnMSMVp-Tcb0MSBVKQ7GLg)
 with supporting [materials](https://github.com/marcel-dempers/docker-development-youtube-series)
+- Testing
+
+### PRIMARY
+
+```sh
+/usr/bin/podman run --name pg_primary \ 
+    --env POSTGRESQL_SERVER_TYPE=master \
+--env POSTGRESQL_CONFIG_FILE=/mnt/volumes/configmaps/primary/postgresql.conf \
+    --interactive \
+    --publish 5432:5432 \
+    --rm \
+    --tty \
+    --volume Backup:/mnt/volumes/backups \
+    --volume Data:/mnt/volumes/container \
+    --volume Configmaps:/mnt/volumes/configmaps \
+    --volume Secrets:/mnt/volumes/secrets \
+      docker.io/gautada/postgresql:dev 
+```
+
+### REPLICA
+
+```sh
+/usr/bin/podman run --name pg_replica \ 
+    --env POSTGRESQL_SERVER_TYPE=replica \
+--env POSTGRESQL_CONFIG_FILE=/mnt/volumes/configmaps/replica/postgresql.conf \
+    --env POSTGRESQL_PRIMARY_HOST=primary.postgresql.gautier.org
+    --interactive \
+    --publish 5433:5432 \
+    --rm \
+    --tty \
+    --volume Backup:/mnt/volumes/backups \
+    --volume Data:/mnt/volumes/container \
+    --volume Configmaps:/mnt/volumes/configmaps \
+    --volume Secrets:/mnt/volumes/secrets \
+      docker.io/gautada/postgresql:dev 
+```
