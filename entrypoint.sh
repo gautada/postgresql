@@ -53,9 +53,14 @@ if [ "${PG_TYPE}" = "MASTER" ]; then
  fi 
 elif [ "${PG_TYPE}" = "REPLICA" ]; then
  echo "[WARN] Establish standby: @to-do read primary pg_basebackup"
+ # pg_basebackup --help
  mkdir -p "${DATA_DIR}"
+ # cp "${CONFIG_FILE}" "${DATA_DIR}/postgresql.auto.conf"
+ chmod 750 -R  "${DATA_DIR}"
  pg_basebackup --pgdata="${DATA_DIR}" --host="${PRIMARY_HOST}" \
                --port="${PRIMARY_PORT}" --username="${PRIMARY_USER}"
+ # Set server to standby
+ touch "${DATA_DIR}/standby.signal"
 else
  echo "[ERROR] Uknown server type(${PG_TYPE})"
  exit 1

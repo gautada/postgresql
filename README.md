@@ -42,7 +42,15 @@ and performance tuning.
 ### Lists databases
 
 To list all of the database on the server use `\list`
+
 ## Users
+
+Replicator user is needed to support replica backups
+
+```sh
+/usr/bin/createuser --username=postgres --pwprompt --connection-limit=5 \
+                    --replication replicator
+```
 
 ### List users
 
@@ -52,7 +60,8 @@ To list all of the user on the server use `\du`.
 
 #### Enable encrypted passwords
 
-In the `postgresql.conf` file enable encrypted password by added `password_encryption = scram-sha-256`.
+In the `postgresql.conf` file enable encrypted password by added
+`password_encryption = scram-sha-256`.
 
 #### Set a user password
 
@@ -66,17 +75,18 @@ ALTER USER myuser WITH ENCRYPTED PASSWORD 'mypassword';
 SELECT rolname, rolpassword FROM pg_authid WHERE rolname = 'myuser';
 ```
 
-#### Change database owner;
+#### Change database owner
 
-```
+```sql
 ALTER DATABASE mydb OWNER TO newuser;
 ```
 
 #### Rename existing user
 
-```
+```sql
 ALTER ROLE test RENAME to test;
 ```
+
 ### TLS Setup
 
 ## Notes
