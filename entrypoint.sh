@@ -21,9 +21,14 @@ DATA_DIR="${POSTGRESQL_DATA_DIRECTORY:-/home/postgres/pgdata}"
 BACKUP_FILE="${POSTGRESQL_BACKUP_FILE:-/mnt/volumes/container/postgresql.sql}"
 REPLICA_HOST="${POSTGRESQL_REPLICA_HOST:-svc.foo.postgresql-replica}"
 REPLICA_PORT="${POSTGRESQL_REPLICA_PORT:-5432}"
-REPLICA_DB="${POSTGRESQL_REPLICA_DATABASE:-db}"
+# REPLICA_DB="${POSTGRESQL_REPLICA_DATABASE:-db}"
 REPLICA_USER="${POSTGRESQL_REPLICA_USER:-user}"
-REPLICA_PWD="${POSTGRESQL_REPLICA_USER:-pwd}"
+# REPLICA_PWD="${POSTGRESQL_REPLICA_USER:-pwd}"
+PRIMARY_HOST="${POSTGRESQL_REPLICA_HOST:-svc.foo.postgresql-replica}"
+PRIMARY_PORT="${POSTGRESQL_REPLICA_PORT:-5432}"
+# PRIMARY_DB="${POSTGRESQL_REPLICA_DATABASE:-db}"
+PRIMARY_USER="${POSTGRESQL_REPLICA_USER:-user}"
+# REPLICA_PWD="${POSTGRESQL_REPLICA_USER:-pwd}"
 export ARCHIVE_DIR="${POSTGRESQL_ARCHIVE_DIRECTORY:-/home/postgres/archive}"
 CONFIG_FILE="${POSTGRESQL_CONFIG_FILE:-/etc/container/postgresql.conf}"
 
@@ -41,16 +46,14 @@ if [ "${PG_TYPE}" = "MASTER" ]; then
    mv "${BACKUP_FILE}" "${BACKUP_FILE}~"
   else
    echo "[WARN] Recover from standby: @to-do: read standby pg_basebackup"
-   pg_basebackup --help
-   echo "${REPLICA_HOST}"
-   echo "${REPLICA_PORT}"
-   echo "${REPLICA_DB}"
-   echo "${REPLICA_USER}"
-   echo "${REPLICA_PWD}"
+   pg_basebackup --pgdata="${DATA_DIR}" --host="${REPLICA_HOST}" \
+                 --port="${REPLICA_PORT}" --username="${REPLICA_USER}"
   fi
  fi 
 elif [ "${PG_TYPE}" = "REPLICA" ]; then
  echo "[WARN] Establish standby: @to-do read primary pg_basebackup"
+ pg_basebackup --pgdata="${DATA_DIR}" --host="${PRIMARY_HOST}" \
+               --port="${PRIMARY_PORT}" --username="${PRIMARY_USER}"
 else
  echo "[ERROR] Uknown server type(${PG_TYPE})"
  exit 1
