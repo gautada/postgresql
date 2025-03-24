@@ -2,70 +2,62 @@
 #
 # entrypoint: OVerloaded entrypoint. Just run the postgresql server
 
-# STEPS
-# Determine if master or replica
-# IF Master?
-# - IF there is a backup file then load the backup file to a minimal config
-# - Check if there are replicas, if yes fail.
-# - If no replicas then launch master from backup and archive backup.
-# ELSE
-# - Replicate from replica 
-# - Launch master (replicas should kick-in
-# ELSE Replica
-# - check replica: SELECT pg_is_in_recovery(); Returns true → This is a replica.
-# - pg_basebackup
-# - constant replicate
-
-PG_TYPE=$(echo "${POSTGRESQL_SERVER_TYPE:-master}" | tr '[:lower:]' '[:upper:]')
-DATA_DIR="${POSTGRESQL_DATA_DIRECTORY:-/home/postgres/pgdata}"
-BACKUP_FILE="${POSTGRESQL_BACKUP_FILE:-/mnt/volumes/container/postgresql.sql}"
-REPLICA_HOST="${POSTGRESQL_REPLICA_HOST:-replica.postgresql.domain.tld}"
-REPLICA_PORT="${POSTGRESQL_REPLICA_PORT:-5432}"
-# REPLICA_DB="${POSTGRESQL_REPLICA_DATABASE:-db}"
-REPLICA_USER="${POSTGRESQL_REPLICA_USER:-replicator}"
-# REPLICA_PWD="${POSTGRESQL_REPLICA_USER:-pwd}"
-PRIMARY_HOST="${POSTGRESQL_PRIMARY_HOST:-primary.postgresql.domain.tld}"
-PRIMARY_PORT="${POSTGRESQL_PRIMARY_PORT:-5432}"
-# PRIMARY_DB="${POSTGRESQL_REPLICA_DATABASE:-db}"
-PRIMARY_USER="${POSTGRESQL_PRIMARY_USER:-replicator}"
-# REPLICA_PWD="${POSTGRESQL_REPLICA_USER:-pwd}"
-export ARCHIVE_DIR="${POSTGRESQL_ARCHIVE_DIRECTORY:-/home/postgres/archive}"
+PG_TYPE=$(echo "${POSTGRESQL_SERVER_TYPE:-PRIMARY}" | tr '[:lower:]' '[:upper:]')
 CONFIG_FILE="${POSTGRESQL_CONFIG_FILE:-/etc/container/postgresql.conf}"
+DATA_DIR="${POSTGRESQL_DATA_DIRECTORY:-/home/postgres/pgdata}"
+RESTORE_FILE="${POSTGRESQL_RESTORE_FILE:-/mnt/volumes/container/postgresql.sql}"
+REPLICATION_HOST="${POSTGRESQL_REPLICATION_HOST:-replica.postgresql.domain.tld}"
+REPLICATION_PORT="${POSTGRESQL_REPLICATION_PORT:-5432}"
+REPLICATION_USER="${POSTGRESQL_REPLICATION_USER:-replicator}"
+REPLICATION_PASSWORD="${POSTGRESQL_REPLICATION_USER:-null}"
+export ARCHIVE_DIR="${POSTGRESQL_ARCHIVE_DIRECTORY:-/home/postgres/archive}"
 
 if [ "${PG_TYPE}" = "MASTER" ]; then
  if [ -d "${DATA_DIR}" ] ; then
   echo "[INFO] Existing data directory: ${DATA_DIR}" >&2
  else
-  if [ -f "${BACKUP_FILE}" ] ; then
-   echo "[INFO] Recover from backup file: ${BACKUP_FILE}"
+  if [ -f "${RESTORE_FILE}" ] ; then
+   echo "[INFO] Restore from file: ${RESTORE_FILE}"
    echo "[INFO] Initialize database directory: ${DATA_DIR}"
    /usr/bin/initdb "${DATA_DIR}"
    pg_ctl -D "${DATA_DIR}" start
-   psql -U postgres -f "${BACKUP_FILE}"
+   psql -U postgres -f "${RESTORE_FILE}"
    pg_ctl -D "${DATA_DIR}" stop
-   mv "${BACKUP_FILE}" "${BACKUP_FILE}~"
+   echo "[INFO] Backup restorefile: ${RESTORE_FILE}"
+   mv "${RESTORE_FILE}" "${RESTORE_FILE}~"
   else
-   echo "[WARN] Recover from standby: @to-do: read standby pg_basebackup"
    mkdir -p "${DATA_DIR}"
    chmod 750 -R  "${DATA_DIR}"
-   pg_basebackup --pgdata="${DATA_DIR}" --host="${REPLICA_HOST}" \
-      --port="${REPLICA_PORT}" \
-      --username="${REPLICA_USER}" || exit 4
+   PGPASSWORD="${REPLICATION_PASSWORD}" pg_basebackup \
+    --pgdata="${DATA_DIR}" \
+    --host="${REPLICATION_HOST}" \
+    --port="${REPLICATION_PORT}" \
+    --username="${REPLICATION_USER}" -Xs -P || exit 3
+   echo "[INFO] Promote primary"
    rm -rf "${DATA_DIR}/standby.signal"
    touch "${DATA_DIR}/failover.signal"
   fi
  fi 
 elif [ "${PG_TYPE}" = "REPLICA" ]; then
- echo "[WARN] Establish replica: @to-do read primary pg_basebackup"
- # pg_basebackup --help
+   echo "[INFO] Replicate from primary server ..."
+ echo "[INFO] ... Read configuration from ${CONFIG_FILE}"
+ line=$(grep "primary_conninfo") "${CONFIG_FILE}"
+ REPLICATION_HOST=${POSTGRESQL_REPLICATION_HOST:-$(echo "${line}" | sed -n "s/.*host=\([^ ]*\).*/\1/p")}
+ REPLICATION_PORT=${POSTGRESQL_REPLICATION_PORT:-$(echo "${line}" | sed -n "s/.*port=\([^ ]*\).*/\1/p")}
+ REPLICATION_USER=${POSTGRESQL_REPLICATION_USER:-$(echo "${line}" | sed -n "s/.*user=\([^ ]*\).*/\1/p")}
+ REPLICATION_PASSWORD=${POSTGRESQL_REPLICATION_PASSWORD:-$(echo "{$line}" | sed -n "s/.*user=\([^ ]*\).*/\1/p")}
+ echo "[INFO] Replication parameters ..."
+ echo "[INFO] ... Host: ${REPLICATION_HOST}"
+ echo "[INFO] ... Port: ${REPLICATION_PORT}"
+ echo "[INFO] ... User: ${REPLICATION_USER}"
  mkdir -p "${DATA_DIR}"
  # cp "${CONFIG_FILE}" "${DATA_DIR}/postgresql.auto.conf"
  chmod 750 -R  "${DATA_DIR}"
- pg_basebackup --pgdata="${DATA_DIR}" --host="${PRIMARY_HOST}" \
-    --port="${PRIMARY_PORT}" \
-    --username="${PRIMARY_USER}" || exit 3
-
- # Set server to standby
+ PGPASSWORD="${REPLICATION_PASSWORD}" pg_basebackup \
+    --pgdata="${DATA_DIR}" \
+    --host="${REPLICATION_HOST}" \
+    --port="${REPLICATION_PORT}" \
+    --username="${REPLICATION_USER}" -P || exit 2
  touch "${DATA_DIR}/standby.signal"
 else
  echo "[ERROR] Uknown server type(${PG_TYPE})"
