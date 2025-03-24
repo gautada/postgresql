@@ -28,7 +28,7 @@ if [ "${PG_TYPE}" = "PRIMARY" ]; then
    echo "[INFO] Backup restorefile: ${RESTORE_FILE}"
    mv "${RESTORE_FILE}" "${RESTORE_FILE}~"
   else
-   tail -f /var/null
+   tail -f /dev/null
    exit 99
    echo "[WARN] Could not find a restore file ${RESTORE_FILE} "
    dir_path=$(dirname "${RESTORE_FILE}")
