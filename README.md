@@ -98,7 +98,7 @@ with supporting [materials](https://github.com/marcel-dempers/docker-development
 ### PRIMARY
 
 ```sh
-/usr/bin/podman run --name pg_primary \ 
+/usr/bin/podman run --name pg_primary \
     --env POSTGRESQL_SERVER_TYPE=master \
 --env POSTGRESQL_CONFIG_FILE=/mnt/volumes/configmaps/primary/postgresql.conf \
     --interactive \
@@ -115,10 +115,11 @@ with supporting [materials](https://github.com/marcel-dempers/docker-development
 ### REPLICA
 
 ```sh
-/usr/bin/podman run --name pg_replica \ 
+/usr/bin/podman run --name pg_replica \
     --env POSTGRESQL_SERVER_TYPE=replica \
 --env POSTGRESQL_CONFIG_FILE=/mnt/volumes/configmaps/replica/postgresql.conf \
-    --env POSTGRESQL_PRIMARY_HOST=primary.postgresql.gautier.org
+    --env POSTGRESQL_PRIMARY_HOST=primary.postgresql.gautier.org \
+    --env POSTGRESQL_PRIMARY_USER=replicator \
     --interactive \
     --publish 5433:5432 \
     --rm \
@@ -127,5 +128,5 @@ with supporting [materials](https://github.com/marcel-dempers/docker-development
     --volume Data:/mnt/volumes/container \
     --volume Configmaps:/mnt/volumes/configmaps \
     --volume Secrets:/mnt/volumes/secrets \
-      docker.io/gautada/postgresql:dev 
+      docker.io/gautada/postgresql:dev
 ```

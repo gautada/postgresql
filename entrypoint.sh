@@ -27,7 +27,7 @@ REPLICA_USER="${POSTGRESQL_REPLICA_USER:-replication}"
 PRIMARY_HOST="${POSTGRESQL_PRIMARY_HOST:-primary.postgresql.domain.tld}"
 PRIMARY_PORT="${POSTGRESQL_PRIMARY_PORT:-5432}"
 # PRIMARY_DB="${POSTGRESQL_REPLICA_DATABASE:-db}"
-PRIMARY_USER="${POSTGRESQL_PRIMARY_USER:-replication}"
+PRIMARY_USER="${POSTGRESQL_PRIMARY_USER:-replicator}"
 # REPLICA_PWD="${POSTGRESQL_REPLICA_USER:-pwd}"
 export ARCHIVE_DIR="${POSTGRESQL_ARCHIVE_DIRECTORY:-/home/postgres/archive}"
 CONFIG_FILE="${POSTGRESQL_CONFIG_FILE:-/etc/container/postgresql.conf}"
@@ -52,13 +52,15 @@ if [ "${PG_TYPE}" = "MASTER" ]; then
   fi
  fi 
 elif [ "${PG_TYPE}" = "REPLICA" ]; then
- echo "[WARN] Establish standby: @to-do read primary pg_basebackup"
+ echo "[WARN] Establish replica: @to-do read primary pg_basebackup"
  # pg_basebackup --help
  mkdir -p "${DATA_DIR}"
  # cp "${CONFIG_FILE}" "${DATA_DIR}/postgresql.auto.conf"
  chmod 750 -R  "${DATA_DIR}"
  pg_basebackup --pgdata="${DATA_DIR}" --host="${PRIMARY_HOST}" \
-               --port="${PRIMARY_PORT}" --username="${PRIMARY_USER}"
+    --port="${PRIMARY_PORT}" \
+    --username="${PRIMARY_USER}" || echo "[ERROR] Basebackup failed" exit 3
+
  # Set server to standby
  touch "${DATA_DIR}/standby.signal"
 else
