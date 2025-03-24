@@ -12,7 +12,7 @@ REPLICATION_USER="${POSTGRESQL_REPLICATION_USER:-replicator}"
 REPLICATION_PASSWORD="${POSTGRESQL_REPLICATION_USER:-null}"
 export ARCHIVE_DIR="${POSTGRESQL_ARCHIVE_DIRECTORY:-/home/postgres/archive}"
 
-if [ "${PG_TYPE}" = "MASTER" ]; then
+if [ "${PG_TYPE}" = "PRIMARY" ]; then
  if [ -d "${DATA_DIR}" ] ; then
   echo "[INFO] Existing data directory: ${DATA_DIR}" >&2
  else
@@ -37,7 +37,7 @@ if [ "${PG_TYPE}" = "MASTER" ]; then
    rm -rf "${DATA_DIR}/standby.signal"
    touch "${DATA_DIR}/failover.signal"
   fi
- fi 
+ fi
 elif [ "${PG_TYPE}" = "REPLICA" ]; then
    echo "[INFO] Replicate from primary server ..."
  echo "[INFO] ... Read configuration from ${CONFIG_FILE}"
