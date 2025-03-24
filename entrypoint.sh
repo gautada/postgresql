@@ -22,7 +22,7 @@ BACKUP_FILE="${POSTGRESQL_BACKUP_FILE:-/mnt/volumes/container/postgresql.sql}"
 REPLICA_HOST="${POSTGRESQL_REPLICA_HOST:-replica.postgresql.domain.tld}"
 REPLICA_PORT="${POSTGRESQL_REPLICA_PORT:-5432}"
 # REPLICA_DB="${POSTGRESQL_REPLICA_DATABASE:-db}"
-REPLICA_USER="${POSTGRESQL_REPLICA_USER:-replication}"
+REPLICA_USER="${POSTGRESQL_REPLICA_USER:-replicator}"
 # REPLICA_PWD="${POSTGRESQL_REPLICA_USER:-pwd}"
 PRIMARY_HOST="${POSTGRESQL_PRIMARY_HOST:-primary.postgresql.domain.tld}"
 PRIMARY_PORT="${POSTGRESQL_PRIMARY_PORT:-5432}"
@@ -47,8 +47,10 @@ if [ "${PG_TYPE}" = "MASTER" ]; then
   else
    echo "[WARN] Recover from standby: @to-do: read standby pg_basebackup"
    mkdir -p "${DATA_DIR}"
+   chmod 750 -R  "${DATA_DIR}"
    pg_basebackup --pgdata="${DATA_DIR}" --host="${REPLICA_HOST}" \
-                 --port="${REPLICA_PORT}" --username="${REPLICA_USER}"
+      --port="${REPLICA_PORT}" \
+      --username="${REPLICA_USER}" || echo "[ERROR] Base backup failed" ; exit 4
   fi
  fi 
 elif [ "${PG_TYPE}" = "REPLICA" ]; then
@@ -59,7 +61,7 @@ elif [ "${PG_TYPE}" = "REPLICA" ]; then
  chmod 750 -R  "${DATA_DIR}"
  pg_basebackup --pgdata="${DATA_DIR}" --host="${PRIMARY_HOST}" \
     --port="${PRIMARY_PORT}" \
-    --username="${PRIMARY_USER}" || echo "[ERROR] Basebackup failed" exit 3
+    --username="${PRIMARY_USER}" || exit 3
 
  # Set server to standby
  touch "${DATA_DIR}/standby.signal"

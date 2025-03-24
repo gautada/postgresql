@@ -101,6 +101,9 @@ with supporting [materials](https://github.com/marcel-dempers/docker-development
 /usr/bin/podman run --name pg_primary \
     --env POSTGRESQL_SERVER_TYPE=master \
 --env POSTGRESQL_CONFIG_FILE=/mnt/volumes/configmaps/primary/postgresql.conf \
+--env POSTGRESQL_REPLICA_HOST=replica.postgresql.gautier.org \
+--env POSTGRESQL_REPLICA_PORT=5433 \
+--env POSTGRESQL_REPLICA_USER=replicator \
     --interactive \
     --publish 5432:5432 \
     --rm \
