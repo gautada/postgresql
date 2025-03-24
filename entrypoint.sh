@@ -51,6 +51,8 @@ if [ "${PG_TYPE}" = "MASTER" ]; then
    pg_basebackup --pgdata="${DATA_DIR}" --host="${REPLICA_HOST}" \
       --port="${REPLICA_PORT}" \
       --username="${REPLICA_USER}" || exit 4
+   rm -rf "${DATA_DIR}/standby.signal"
+   touch "${DATA_DIR}/failover.signal"
   fi
  fi 
 elif [ "${PG_TYPE}" = "REPLICA" ]; then
