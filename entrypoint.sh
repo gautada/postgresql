@@ -12,6 +12,8 @@ REPLICATION_USER="${POSTGRESQL_REPLICATION_USER:-replicator}"
 REPLICATION_PASSWORD="${POSTGRESQL_REPLICATION_USER:-null}"
 export ARCHIVE_DIR="${POSTGRESQL_ARCHIVE_DIRECTORY:-/home/postgres/archive}"
 
+# shellcheck disable=SC2317
+
 if [ "${PG_TYPE}" = "PRIMARY" ]; then
  if [ -d "${DATA_DIR}" ] ; then
   echo "[INFO] Existing data directory: ${DATA_DIR}" >&2
@@ -26,6 +28,8 @@ if [ "${PG_TYPE}" = "PRIMARY" ]; then
    echo "[INFO] Backup restorefile: ${RESTORE_FILE}"
    mv "${RESTORE_FILE}" "${RESTORE_FILE}~"
   else
+   tail -f /var/null
+   exit 99
    echo "[WARN] Could not find a restore file ${RESTORE_FILE} "
    dir_path=$(dirname "${RESTORE_FILE}")
    echo "[WARN] Files in directory: ${dir_path}"
