@@ -28,12 +28,13 @@ if [ "${PG_TYPE}" = "PRIMARY" ]; then
    echo "[INFO] Backup restorefile: ${RESTORE_FILE}"
    mv "${RESTORE_FILE}" "${RESTORE_FILE}~"
   else
-   tail -f /dev/null
-   exit 99
    echo "[WARN] Could not find a restore file ${RESTORE_FILE} "
    dir_path=$(dirname "${RESTORE_FILE}")
    echo "[WARN] Files in directory: ${dir_path}"
    ls -l "${dir_path}"
+   
+   tail -f /dev/null
+   exit 99
    mkdir -p "${DATA_DIR}"
    chmod 750 -R  "${DATA_DIR}"
    PGPASSWORD="${REPLICATION_PASSWORD}" pg_basebackup \
