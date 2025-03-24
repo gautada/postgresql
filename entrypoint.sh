@@ -50,7 +50,7 @@ if [ "${PG_TYPE}" = "MASTER" ]; then
    chmod 750 -R  "${DATA_DIR}"
    pg_basebackup --pgdata="${DATA_DIR}" --host="${REPLICA_HOST}" \
       --port="${REPLICA_PORT}" \
-      --username="${REPLICA_USER}" || echo "[ERROR] Base backup failed" ; exit 4
+      --username="${REPLICA_USER}" || exit 4
   fi
  fi 
 elif [ "${PG_TYPE}" = "REPLICA" ]; then
