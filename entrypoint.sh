@@ -26,16 +26,21 @@ if [ "${PG_TYPE}" = "PRIMARY" ]; then
    echo "[INFO] Backup restorefile: ${RESTORE_FILE}"
    mv "${RESTORE_FILE}" "${RESTORE_FILE}~"
   else
-   mkdir -p "${DATA_DIR}"
-   chmod 750 -R  "${DATA_DIR}"
-   PGPASSWORD="${REPLICATION_PASSWORD}" pg_basebackup \
-    --pgdata="${DATA_DIR}" \
-    --host="${REPLICATION_HOST}" \
-    --port="${REPLICATION_PORT}" \
-    --username="${REPLICATION_USER}" -Xs -P || exit 3
-   echo "[INFO] Promote primary"
-   rm -rf "${DATA_DIR}/standby.signal"
-   touch "${DATA_DIR}/failover.signal"
+   echo "[WARN] Could not find a restore file ${RESTORE_FILE} "
+   dir_path=$(dirname "${RESTORE_FILE}")
+   echo "Files in directory: ${dir_path}"
+   ls -l "${dir_path}"
+   tail -f /dev/null
+   # mkdir -p "${DATA_DIR}"
+   # chmod 750 -R  "${DATA_DIR}"
+   # PGPASSWORD="${REPLICATION_PASSWORD}" pg_basebackup \
+   #  --pgdata="${DATA_DIR}" \
+   #  --host="${REPLICATION_HOST}" \
+   #  --port="${REPLICATION_PORT}" \
+   #  --username="${REPLICATION_USER}" -Xs -P || exit 3
+   # echo "[INFO] Promote primary"
+   # rm -rf "${DATA_DIR}/standby.signal"
+   # touch "${DATA_DIR}/failover.signal"
   fi
  fi
 elif [ "${PG_TYPE}" = "REPLICA" ]; then
