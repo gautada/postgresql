@@ -26,15 +26,16 @@ if [ "${PG_TYPE}" = "PRIMARY" ]; then
    psql -U postgres -f "${RESTORE_FILE}"
    pg_ctl -D "${DATA_DIR}" stop
    echo "[INFO] Backup restorefile: ${RESTORE_FILE}"
-   # mv "${RESTORE_FILE}" "${RESTORE_FILE}~"
+   # Need to add a variable to allow debugging
+   mv "${RESTORE_FILE}" "${RESTORE_FILE}~"
   else
    echo "[WARN] Could not find a restore file ${RESTORE_FILE} "
    dir_path=$(dirname "${RESTORE_FILE}")
    echo "[WARN] Files in directory: ${dir_path}"
    ls -l "${dir_path}"
-
-   tail -f /dev/null
-   exit 99
+   #
+   # tail -f /dev/null
+   # exit 99
    mkdir -p "${DATA_DIR}"
    chmod 750 -R  "${DATA_DIR}"
    PGPASSWORD="${REPLICATION_PASSWORD}" pg_basebackup \
