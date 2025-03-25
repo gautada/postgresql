@@ -26,7 +26,7 @@ if [ "${PG_TYPE}" = "PRIMARY" ]; then
    psql -U postgres -f "${RESTORE_FILE}"
    pg_ctl -D "${DATA_DIR}" stop
    echo "[INFO] Backup restorefile: ${RESTORE_FILE}"
-   mv "${RESTORE_FILE}" "${RESTORE_FILE}~"
+   # mv "${RESTORE_FILE}" "${RESTORE_FILE}~"
   else
    echo "[WARN] Could not find a restore file ${RESTORE_FILE} "
    dir_path=$(dirname "${RESTORE_FILE}")
