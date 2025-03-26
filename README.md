@@ -89,6 +89,17 @@ ALTER ROLE test RENAME to test;
 
 ### TLS Setup
 
+#### Create Secret
+
+```sh
+kubectl create secret -n data generic tls \
+  --from-file=key=key.pem \
+  --from-file=cert=cert.pem \
+  --from-file=ca=ca.pem \
+  --from-file=ccert=../client/cert.pem \
+  --from-file=ckey=../client/key.pem
+```
+
 ## Notes
 
 - [Postgresql Video Series](https://www.youtube.com/playlist?list=PLHq1uqvAteVsnMSMVp-Tcb0MSBVKQ7GLg)
