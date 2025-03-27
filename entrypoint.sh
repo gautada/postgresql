@@ -89,6 +89,10 @@ if [ -f "${RESTORE_FILE}" ] ; then
  fi
 fi
 
+mkdir -p /etc/container/secrets/
+cp /mnt/volumes/secrets/*.pem /etc/container/secrets/
+chmod 600 /etc/container/secrets/*.pem
+ls -al /etc/container/secrets/
 echo "[INFO] Start server ..."
 echo "[INFO] ... with configuration: ${CONFIG_FILE}"
 echo "[INFO] ... with data directory: ${DATA_DIR}"
