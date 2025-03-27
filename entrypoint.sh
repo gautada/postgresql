@@ -41,7 +41,8 @@ if [ "${PG_TYPE}" = "PRIMARY" ]; then
    ls -l "${dir_path}"
    mkdir -p "${DATA_DIR}"
    chmod 750 -R  "${DATA_DIR}"
-   export PGPASSWORD=cat "${HOME}/.pgpass"
+   PGPASSWORD="$(cat "${HOME}/.pgpass")" || exit 1
+   export PGPASSWORD
    pg_basebackup \
     --pgdata="${DATA_DIR}" \
     --host="${REPLICATION_HOST}" \
@@ -68,7 +69,8 @@ elif [ "${PG_TYPE}" = "REPLICA" ]; then
  mkdir -p "${DATA_DIR}"
  # cp "${CONFIG_FILE}" "${DATA_DIR}/postgresql.auto.conf"
  chmod 750 -R  "${DATA_DIR}"
- export PGPASSWORD=cat "${HOME}/.pgpass"
+ PGPASSWORD="$(cat "${HOME}/.pgpass")" || exit 1
+ export PGPASSWORD
  pg_basebackup \
     --pgdata="${DATA_DIR}" \
     --host="${REPLICATION_HOST}" \
