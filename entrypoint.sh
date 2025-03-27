@@ -42,28 +42,15 @@ if [ "${PG_TYPE}" = "PRIMARY" ]; then
    ls -l "${dir_path}"
    mkdir -p "${DATA_DIR}"
    chmod 750 -R  "${DATA_DIR}"
-   PGPASSWORD="$(cat "${HOME}/.pgpass")" || exit 1
-   export PGPASSWORD
-   # pg_basebackup \
-   #  --pgdata="${DATA_DIR}" \
-   #  --host="${REPLICATION_HOST}" \
-   #  --port="${REPLICATION_PORT}" \
-   #  --username="${REPLICATION_USER}" \
-   #  --sslmode=verify-full \
-   #  --sslcert=/etc/container/secrets/client-cert.pem \
-   #  --sslkey=/etc/container/secrets/client-key.pem \
-   #  --sslrootcert=/etc/ssl/cert.pem \
-   #  -Xs -P || exit 3
-   # unset PGPASSWORD
-   pg_basebackup --pgdata="${DATA_DIR}" \
-   -d "host=${REPLICATION_HOST}
-   port=${REPLICATION_PORT}
-   user=${REPLICATION_USER}
-   dbname=replication
-   sslmode=verify-full
-   sslcert=/etc/container/secrets/client-cert.pem
-   sslkey=/etc/container/secrets/client-key.pem
-   sslrootcert=/etc/ssl/cert.pem" -P || exit 2
+   DBURL="postgresql://${REPLICATION_USER}:"
+   DBURL="${DBURL}$(tr -d '[:space:]' < "${HOME}/.pgpass")"
+   DBURL="${DBURL}@${REPLICATION_HOST}:${REPLICATION_PORT}/replication?"
+   DBURL="${DBURL}sslmode=verify-full&"
+   DBURL="${DBURL}sslcert=/etc/container/secrets/client-cert.pem&"
+   DBURL="${DBURL}sslkey=/etc/container/secrets/client-key.pem&"
+   DBURL="sslrootcert=/etc/ssl/cert.pem"
+   echo "[INFO] Start base backup ${DBURL}"
+   pg_basebackup --pgdata=./pgdata --dbname "${DBURL}"  --verbose --progress
    echo "[INFO] Promote primary"
    rm -rf "${DATA_DIR}/standby.signal"
    touch "${DATA_DIR}/failover.signal"
@@ -82,21 +69,16 @@ elif [ "${PG_TYPE}" = "REPLICA" ]; then
  echo "[INFO] ... Port: ${REPLICATION_PORT}"
  echo "[INFO] ... User: ${REPLICATION_USER}"
  mkdir -p "${DATA_DIR}"
- # cp "${CONFIG_FILE}" "${DATA_DIR}/postgresql.auto.conf"
  chmod 750 -R  "${DATA_DIR}"
- # PGPASSWORD="$(cat "${HOME}/.pgpass")" || exit 1
- # export PGPASSWORD
- # pg_basebackup --pgdata="${DATA_DIR}" \
- #    -d "host=${REPLICATION_HOST}
- #        port=${REPLICATION_PORT}
- #        user=${REPLICATION_USER}
- #        dbname=replication
- #        sslmode=verify-full
- #        sslcert=/etc/container/secrets/client-cert.pem
- #        sslkey=/etc/container/secrets/client-key.pem
- #        sslrootcert=/etc/ssl/cert.pem" -P || exit 2
- # unset PGPASSWORD
- tail -f /dev/null
+ DBURL="postgresql://${REPLICATION_USER}:"
+  DBURL="${DBURL}$(tr -d '[:space:]' < "${HOME}/.pgpass")"
+  DBURL="${DBURL}@${REPLICATION_HOST}:${REPLICATION_PORT}/replication?"
+  DBURL="${DBURL}sslmode=verify-full&"
+  DBURL="${DBURL}sslcert=/etc/container/secrets/client-cert.pem&"
+  DBURL="${DBURL}sslkey=/etc/container/secrets/client-key.pem&"
+  DBURL="sslrootcert=/etc/ssl/cert.pem"
+  echo "[INFO] Start base backup ${DBURL}"
+  pg_basebackup --pgdata=./pgdata --dbname "${DBURL}"  --verbose --progress
  touch "${DATA_DIR}/standby.signal"
 else
  echo "[ERROR] Uknown server type(${PG_TYPE})"
