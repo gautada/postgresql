@@ -84,18 +84,19 @@ elif [ "${PG_TYPE}" = "REPLICA" ]; then
  mkdir -p "${DATA_DIR}"
  # cp "${CONFIG_FILE}" "${DATA_DIR}/postgresql.auto.conf"
  chmod 750 -R  "${DATA_DIR}"
- PGPASSWORD="$(cat "${HOME}/.pgpass")" || exit 1
- export PGPASSWORD
- pg_basebackup --pgdata="${DATA_DIR}" \
-    -d "host=${REPLICATION_HOST}
-        port=${REPLICATION_PORT}
-        user=${REPLICATION_USER}
-        dbname=replication
-        sslmode=verify-full
-        sslcert=/etc/container/secrets/client-cert.pem
-        sslkey=/etc/container/secrets/client-key.pem
-        sslrootcert=/etc/ssl/cert.pem" -P || exit 2
- unset PGPASSWORD
+ # PGPASSWORD="$(cat "${HOME}/.pgpass")" || exit 1
+ # export PGPASSWORD
+ # pg_basebackup --pgdata="${DATA_DIR}" \
+ #    -d "host=${REPLICATION_HOST}
+ #        port=${REPLICATION_PORT}
+ #        user=${REPLICATION_USER}
+ #        dbname=replication
+ #        sslmode=verify-full
+ #        sslcert=/etc/container/secrets/client-cert.pem
+ #        sslkey=/etc/container/secrets/client-key.pem
+ #        sslrootcert=/etc/ssl/cert.pem" -P || exit 2
+ # unset PGPASSWORD
+ tail -f /dev/null
  touch "${DATA_DIR}/standby.signal"
 else
  echo "[ERROR] Uknown server type(${PG_TYPE})"
