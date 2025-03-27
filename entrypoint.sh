@@ -48,7 +48,7 @@ if [ "${PG_TYPE}" = "PRIMARY" ]; then
    DBURL="${DBURL}sslmode=verify-full&"
    DBURL="${DBURL}sslcert=/etc/container/secrets/client-cert.pem&"
    DBURL="${DBURL}sslkey=/etc/container/secrets/client-key.pem&"
-   DBURL="sslrootcert=/etc/ssl/cert.pem"
+   DBURL="${DBURL}sslrootcert=/etc/ssl/cert.pem"
    echo "[INFO] Start base backup ${DBURL}"
    pg_basebackup --pgdata=./pgdata --dbname "${DBURL}"  --verbose --progress
    echo "[INFO] Promote primary"
@@ -76,7 +76,7 @@ elif [ "${PG_TYPE}" = "REPLICA" ]; then
   DBURL="${DBURL}sslmode=verify-full&"
   DBURL="${DBURL}sslcert=/etc/container/secrets/client-cert.pem&"
   DBURL="${DBURL}sslkey=/etc/container/secrets/client-key.pem&"
-  DBURL="sslrootcert=/etc/ssl/cert.pem"
+  DBURL="${DBURL}sslrootcert=/etc/ssl/cert.pem"
   echo "[INFO] Start base backup ${DBURL}"
   tail -f /dev/null
   pg_basebackup --pgdata=./pgdata --dbname "${DBURL}"  --verbose --progress
