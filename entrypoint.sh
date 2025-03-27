@@ -19,7 +19,7 @@ echo "[INFO] Setup security files ${DATA_DIR}" >&2
 mkdir -p /etc/container/secrets/
 cp /mnt/volumes/secrets/*.pem /etc/container/secrets/
 chmod 600 /etc/container/secrets/*.pem
-cat /etc/ssl/cert.pem /etc/container/secrets/ca.pem
+# kcat /etc/ssl/cert.pem /etc/container/secrets/ca.pem
 ls -al /etc/container/secrets/
 cp /mnt/volumes/secrets/replicator.pgpass /home/postgres/.pgpass
 chmod 600 /home/postgres/.pgpass
@@ -78,6 +78,7 @@ elif [ "${PG_TYPE}" = "REPLICA" ]; then
   DBURL="${DBURL}sslkey=/etc/container/secrets/client-key.pem&"
   DBURL="sslrootcert=/etc/ssl/cert.pem"
   echo "[INFO] Start base backup ${DBURL}"
+  tail -f /dev/null
   pg_basebackup --pgdata=./pgdata --dbname "${DBURL}"  --verbose --progress
  touch "${DATA_DIR}/standby.signal"
 else
