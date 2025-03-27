@@ -44,17 +44,26 @@ if [ "${PG_TYPE}" = "PRIMARY" ]; then
    chmod 750 -R  "${DATA_DIR}"
    PGPASSWORD="$(cat "${HOME}/.pgpass")" || exit 1
    export PGPASSWORD
-   pg_basebackup \
-    --pgdata="${DATA_DIR}" \
-    --host="${REPLICATION_HOST}" \
-    --port="${REPLICATION_PORT}" \
-    --username="${REPLICATION_USER}" \
-    --sslmode=verify-full \
-    --sslcert=/etc/container/secrets/client-cert.pem \
-    --sslkey=/etc/container/secrets/client-key.pem \
-    --sslrootcert=/etc/ssl/cert.pem \
-    -Xs -P || exit 3
-   unset PGPASSWORD
+   # pg_basebackup \
+   #  --pgdata="${DATA_DIR}" \
+   #  --host="${REPLICATION_HOST}" \
+   #  --port="${REPLICATION_PORT}" \
+   #  --username="${REPLICATION_USER}" \
+   #  --sslmode=verify-full \
+   #  --sslcert=/etc/container/secrets/client-cert.pem \
+   #  --sslkey=/etc/container/secrets/client-key.pem \
+   #  --sslrootcert=/etc/ssl/cert.pem \
+   #  -Xs -P || exit 3
+   # unset PGPASSWORD
+   pg_basebackup --pgdata="${DATA_DIR}" \
+   -d "host=${REPLICATION_HOST}
+   port=${REPLICATION_PORT}
+   user=${REPLICATION_USER}
+   dbname=replication
+   sslmode=verify-full
+   sslcert=/etc/container/secrets/client-cert.pem
+   sslkey=/etc/container/secrets/client-key.pem
+   sslrootcert=/etc/ssl/cert.pem" -P || exit 2
    echo "[INFO] Promote primary"
    rm -rf "${DATA_DIR}/standby.signal"
    touch "${DATA_DIR}/failover.signal"
@@ -77,16 +86,15 @@ elif [ "${PG_TYPE}" = "REPLICA" ]; then
  chmod 750 -R  "${DATA_DIR}"
  PGPASSWORD="$(cat "${HOME}/.pgpass")" || exit 1
  export PGPASSWORD
- pg_basebackup \
-    --pgdata="${DATA_DIR}" \
-    --host="${REPLICATION_HOST}" \
-    --port="${REPLICATION_PORT}" \
-    --username="${REPLICATION_USER}" \
-    --sslmode=verify-full \
-    --sslcert=/etc/container/secrets/client-cert.pem \
-    --sslkey=/etc/container/secrets/client-key.pem \
-    --sslrootcert=/etc/ssl/cert.pem \
-    -P || exit 2
+ pg_basebackup --pgdata="${DATA_DIR}" \
+    -d "host=${REPLICATION_HOST}
+        port=${REPLICATION_PORT}
+        user=${REPLICATION_USER}
+        dbname=replication
+        sslmode=verify-full
+        sslcert=/etc/container/secrets/client-cert.pem
+        sslkey=/etc/container/secrets/client-key.pem
+        sslrootcert=/etc/ssl/cert.pem" -P || exit 2
  unset PGPASSWORD
  touch "${DATA_DIR}/standby.signal"
 else
