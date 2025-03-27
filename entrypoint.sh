@@ -19,6 +19,7 @@ echo "[INFO] Setup security files ${DATA_DIR}" >&2
 mkdir -p /etc/container/secrets/
 cp /mnt/volumes/secrets/*.pem /etc/container/secrets/
 chmod 600 /etc/container/secrets/*.pem
+cat /etc/ssl/cert.pem /etc/container/secrets/ca.pem
 ls -al /etc/container/secrets/
 cp /mnt/volumes/secrets/replicator.pgpass /home/postgres/.pgpass
 chmod 600 /home/postgres/.pgpass

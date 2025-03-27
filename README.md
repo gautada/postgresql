@@ -89,6 +89,23 @@ ALTER ROLE test RENAME to test;
 
 ### TLS Setup
 
+TLS Setup will be turned off for the current period due to DNS issues and
+resolution issues.
+
+This is the replica setup that used fill SSL.
+
+```txt
+primary_conninfo = '
+host=primary.postgresql.gautier.org
+port=5432
+user=replicator
+sslmode=verify-full
+sslcert=/etc/container/secrets/client-cert.pem
+sslkey=/etc/container/secrets/client-key.pem
+sslrootcert=/etc/container/secrets/ca.pem
+'
+```
+
 #### Create Secret
 
 ```sh
