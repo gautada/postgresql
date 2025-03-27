@@ -92,12 +92,13 @@ ALTER ROLE test RENAME to test;
 #### Create Secret
 
 ```sh
-kubectl create secret -n data generic tls \
+kubectl create secret -n data generic postgresql \
   --from-file=key.pem=key.pem \
   --from-file=cert.pem=cert.pem \
   --from-file=ca.pem=ca.pem \
-  --from-file=ccert.pem=../client/cert.pem \
-  --from-file=ckey.pem=../client/key.pem
+  --from-file=client-cert.pem=../client/cert.pem \
+  --from-file=client-key.pem=../client/key.pem \
+  --from-file=replicator.pgpass=../client/replicator.pgpass
 ```
 
 ## Notes
@@ -123,7 +124,7 @@ with supporting [materials](https://github.com/marcel-dempers/docker-development
     --volume Data:/mnt/volumes/container \
     --volume Configmaps:/mnt/volumes/configmaps \
     --volume Secrets:/mnt/volumes/secrets \
-      docker.io/gautada/postgresql:dev 
+      docker.io/gautada/postgresql:dev
 ```
 
 ### REPLICA
