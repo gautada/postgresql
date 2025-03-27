@@ -46,11 +46,11 @@ if [ "${PG_TYPE}" = "PRIMARY" ]; then
 elif [ "${PG_TYPE}" = "REPLICA" ]; then
  echo "[INFO] Replicate from primary server ..."
  echo "[INFO] ... Read configuration from ${CONFIG_FILE}"
- # line=$(grep "primary_conninfo") "${CONFIG_FILE}"
- # REPLICATION_HOST=${POSTGRESQL_REPLICATION_HOST:-$(echo "${line}" | sed -n "s/.*host=\([^ ]*\).*/\1/p")}
- # REPLICATION_PORT=${POSTGRESQL_REPLICATION_PORT:-$(echo "${line}" | sed -n "s/.*port=\([^ ]*\).*/\1/p")}
- # REPLICATION_USER=${POSTGRESQL_REPLICATION_USER:-$(echo "${line}" | sed -n "s/.*user=\([^ ]*\).*/\1/p")}
- # REPLICATION_PASSWORD=${POSTGRESQL_REPLICATION_PASSWORD:-$(echo "{$line}" | sed -n "s/.*user=\([^ ]*\).*/\1/p")}
+ line=$(grep "primary_conninfo") "${CONFIG_FILE}"
+ REPLICATION_HOST=${POSTGRESQL_REPLICATION_HOST:-$(echo "${line}" | sed -n "s/.*host=\([^ ]*\).*/\1/p")}
+ REPLICATION_PORT=${POSTGRESQL_REPLICATION_PORT:-$(echo "${line}" | sed -n "s/.*port=\([^ ]*\).*/\1/p")}
+ REPLICATION_USER=${POSTGRESQL_REPLICATION_USER:-$(echo "${line}" | sed -n "s/.*user=\([^ ]*\).*/\1/p")}
+ REPLICATION_PASSWORD=${POSTGRESQL_REPLICATION_PASSWORD:-$(echo "{$line}" | sed -n "s/.*user=\([^ ]*\).*/\1/p")}
  echo "[INFO] Replication parameters ..."
  echo "[INFO] ... Host: ${REPLICATION_HOST}"
  echo "[INFO] ... Port: ${REPLICATION_PORT}"
