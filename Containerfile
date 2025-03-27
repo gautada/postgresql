@@ -46,11 +46,12 @@ COPY entrypoint.sh /usr/bin/container-entrypoint
 # ╭――――――――――――――――――――╮
 # │ APPLICATION        │
 # ╰――――――――――――――――――――╯
-RUN /sbin/apk add --no-cache readline \
+RUN /bin/sed -i 's|dl-cdn.alpinelinux.org/alpine/|mirror.math.princeton.edu/pub/alpinelinux/|g' /etc/apk/repositories \
+ && /sbin/apk add --no-cache readline \
                             "${POSTGRES_PACKAGE}" \
                             "${POSTGRES}-contrib" \
-                            py3-psycopg
-RUN /bin/ln -fsv /mnt/volumes/configmaps/postgresql.conf \
+                            py3-psycopg \
+ && /bin/ln -fsv /mnt/volumes/configmaps/postgresql.conf \
                 /etc/container/postgresql.conf \
  && /bin/ln -fsv /mnt/volumes/configmaps/pg_hba.conf \
                 /etc/container/pg_hba.conf \

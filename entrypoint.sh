@@ -9,7 +9,8 @@ RESTORE_FILE="${POSTGRESQL_RESTORE_FILE:-/mnt/volumes/container/postgresql.sql}"
 REPLICATION_HOST="${POSTGRESQL_REPLICATION_HOST:-replica.postgresql.domain.tld}"
 REPLICATION_PORT="${POSTGRESQL_REPLICATION_PORT:-5432}"
 REPLICATION_USER="${POSTGRESQL_REPLICATION_USER:-replicator}"
-REPLICATION_PASSWORD="${POSTGRESQL_REPLICATION_USER:-null}"
+REPLICATION_PASSWORD="${POSTGRESQL_REPLICATION_USER:-replicator}"
+BACKUP_RESTORE_FILE="${POSTGRESQL_BACKUP_RESTORE_FILE:-False}"
 export ARCHIVE_DIR="${POSTGRESQL_ARCHIVE_DIRECTORY:-/home/postgres/archive}"
 
 # shellcheck disable=SC2317
@@ -82,9 +83,10 @@ if [ ! -d "${ARCHIVE_DIR}" ] ; then
 fi
 
 if [ -f "${RESTORE_FILE}" ] ; then
- echo "[INFO] Backup restorefile: ${RESTORE_FILE}"
- # Need to add a variable to allow debugging
- mv "${RESTORE_FILE}" "${RESTORE_FILE}~"
+ if [ "True" = "${BACKUP_RESTORE_FILE}" ] ; then
+  echo "[INFO] Backup restore file: ${RESTORE_FILE}"
+  mv "${RESTORE_FILE}" "${RESTORE_FILE}~"
+ fi
 fi
 
 echo "[INFO] Start server ..."
