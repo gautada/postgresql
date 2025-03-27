@@ -58,7 +58,9 @@ RUN /bin/sed -i 's|dl-cdn.alpinelinux.org/alpine/|mirror.math.princeton.edu/pub/
  && /bin/ln -fsv /mnt/volumes/configmaps/pg_ident.conf \
                 /etc/container/pg_ident.conf \
  && /bin/mkdir -p /run/postgresql \
- && /bin/chown -R $USER:$USER /run/postgresql
+ && /bin/chown -R $USER:$USER /run/postgresql \
+ && mkdir -p /etc/container/secrets \
+ && /bin/chown -R $USER:$USER /etc/container/secrets 
 
 # ╭――――――――――――――――――――╮
 # │ CONTAINER          │
