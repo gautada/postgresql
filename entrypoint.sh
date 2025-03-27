@@ -9,7 +9,7 @@ RESTORE_FILE="${POSTGRESQL_RESTORE_FILE:-/mnt/volumes/container/postgresql.sql}"
 REPLICATION_HOST="${POSTGRESQL_REPLICATION_HOST:-replica.postgresql.domain.tld}"
 REPLICATION_PORT="${POSTGRESQL_REPLICATION_PORT:-5432}"
 REPLICATION_USER="${POSTGRESQL_REPLICATION_USER:-replicator}"
-REPLICATION_PASSWORD="${POSTGRESQL_REPLICATION_PASSWORD:-replicator}"
+# REPLICATION_PASSWORD="${POSTGRESQL_REPLICATION_PASSWORD:-replicator}"
 BACKUP_RESTORE_FILE="${POSTGRESQL_BACKUP_RESTORE_FILE:-True}"
 export ARCHIVE_DIR="${POSTGRESQL_ARCHIVE_DIRECTORY:-/home/postgres/archive}"
 
@@ -41,11 +41,13 @@ if [ "${PG_TYPE}" = "PRIMARY" ]; then
    ls -l "${dir_path}"
    mkdir -p "${DATA_DIR}"
    chmod 750 -R  "${DATA_DIR}"
-   PGPASSWORD="${REPLICATION_PASSWORD}" pg_basebackup \
+   export PGPASSWORD=cat "${HOME}/.pgpass"
+   pg_basebackup \
     --pgdata="${DATA_DIR}" \
     --host="${REPLICATION_HOST}" \
     --port="${REPLICATION_PORT}" \
     --username="${REPLICATION_USER}" -Xs -P || exit 3
+   unset PGPASSWORD
    echo "[INFO] Promote primary"
    rm -rf "${DATA_DIR}/standby.signal"
    touch "${DATA_DIR}/failover.signal"
@@ -58,7 +60,7 @@ elif [ "${PG_TYPE}" = "REPLICA" ]; then
  REPLICATION_HOST=${POSTGRESQL_REPLICATION_HOST:-$(echo "${line}" | sed -n "s/.*host=\([^ ]*\).*/\1/p")}
  REPLICATION_PORT=${POSTGRESQL_REPLICATION_PORT:-$(echo "${line}" | sed -n "s/.*port=\([^ ]*\).*/\1/p")}
  REPLICATION_USER=${POSTGRESQL_REPLICATION_USER:-$(echo "${line}" | sed -n "s/.*user=\([^ ]*\).*/\1/p")}
- REPLICATION_PASSWORD=${POSTGRESQL_REPLICATION_PASSWORD:-$(echo "{$line}" | sed -n "s/.*user=\([^ ]*\).*/\1/p")}
+ # REPLICATION_PASSWORD=${POSTGRESQL_REPLICATION_PASSWORD:-$(echo "{$line}" | sed -n "s/.*user=\([^ ]*\).*/\1/p")}
  echo "[INFO] Replication parameters ..."
  echo "[INFO] ... Host: ${REPLICATION_HOST}"
  echo "[INFO] ... Port: ${REPLICATION_PORT}"
@@ -66,11 +68,13 @@ elif [ "${PG_TYPE}" = "REPLICA" ]; then
  mkdir -p "${DATA_DIR}"
  # cp "${CONFIG_FILE}" "${DATA_DIR}/postgresql.auto.conf"
  chmod 750 -R  "${DATA_DIR}"
- PGPASSWORD="${REPLICATION_PASSWORD}" pg_basebackup \
+ export PGPASSWORD=cat "${HOME}/.pgpass"
+ pg_basebackup \
     --pgdata="${DATA_DIR}" \
     --host="${REPLICATION_HOST}" \
     --port="${REPLICATION_PORT}" \
     --username="${REPLICATION_USER}" -P || exit 2
+ unset PGPASSWORD
  touch "${DATA_DIR}/standby.signal"
 else
  echo "[ERROR] Uknown server type(${PG_TYPE})"
