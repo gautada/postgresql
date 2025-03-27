@@ -49,7 +49,7 @@ if [ "${PG_TYPE}" = "PRIMARY" ]; then
    DBURL="${DBURL}sslcert=/etc/container/secrets/client-cert.pem&"
    DBURL="${DBURL}sslkey=/etc/container/secrets/client-key.pem&"
    DBURL="${DBURL}sslrootcert=/etc/ssl/cert.pem"
-   echo "[INFO] Start base backup ${DBURL}"
+   echo "[INFO] Start base backup ***"
    pg_basebackup --pgdata=./pgdata --dbname "${DBURL}"  --verbose --progress
    echo "[INFO] Promote primary"
    rm -rf "${DATA_DIR}/standby.signal"
@@ -71,15 +71,14 @@ elif [ "${PG_TYPE}" = "REPLICA" ]; then
  mkdir -p "${DATA_DIR}"
  chmod 750 -R  "${DATA_DIR}"
  DBURL="postgresql://${REPLICATION_USER}:"
-  DBURL="${DBURL}$(tr -d '[:space:]' < "${HOME}/.pgpass")"
-  DBURL="${DBURL}@${REPLICATION_HOST}:${REPLICATION_PORT}/replication?"
-  DBURL="${DBURL}sslmode=verify-full&"
-  DBURL="${DBURL}sslcert=/etc/container/secrets/client-cert.pem&"
-  DBURL="${DBURL}sslkey=/etc/container/secrets/client-key.pem&"
-  DBURL="${DBURL}sslrootcert=/etc/ssl/cert.pem"
-  echo "[INFO] Start base backup ${DBURL}"
-  tail -f /dev/null
-  pg_basebackup --pgdata=./pgdata --dbname "${DBURL}"  --verbose --progress
+ DBURL="${DBURL}$(tr -d '[:space:]' < "${HOME}/.pgpass")"
+ DBURL="${DBURL}@${REPLICATION_HOST}:${REPLICATION_PORT}/replication?"
+ DBURL="${DBURL}sslmode=verify-full&"
+ DBURL="${DBURL}sslcert=/etc/container/secrets/client-cert.pem&"
+ DBURL="${DBURL}sslkey=/etc/container/secrets/client-key.pem&"
+ DBURL="${DBURL}sslrootcert=/etc/ssl/cert.pem"
+ echo "[INFO] Start base backup: ***"
+ pg_basebackup --pgdata=./pgdata --dbname "${DBURL}"  --verbose --progress
  touch "${DATA_DIR}/standby.signal"
 else
  echo "[ERROR] Uknown server type(${PG_TYPE})"
