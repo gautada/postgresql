@@ -48,7 +48,12 @@ if [ "${PG_TYPE}" = "PRIMARY" ]; then
     --pgdata="${DATA_DIR}" \
     --host="${REPLICATION_HOST}" \
     --port="${REPLICATION_PORT}" \
-    --username="${REPLICATION_USER}" -Xs -P || exit 3
+    --username="${REPLICATION_USER}" \
+    --sslmode=verify-full \
+    --sslcert=/etc/container/secrets/client-cert.pem \
+    --sslkey=/etc/container/secrets/client-key.pem \
+    --sslrootcert=/etc/ssl/cert.pem \
+    -Xs -P || exit 3
    unset PGPASSWORD
    echo "[INFO] Promote primary"
    rm -rf "${DATA_DIR}/standby.signal"
@@ -76,7 +81,12 @@ elif [ "${PG_TYPE}" = "REPLICA" ]; then
     --pgdata="${DATA_DIR}" \
     --host="${REPLICATION_HOST}" \
     --port="${REPLICATION_PORT}" \
-    --username="${REPLICATION_USER}" -P || exit 2
+    --username="${REPLICATION_USER}" \
+    --sslmode=verify-full \
+    --sslcert=/etc/container/secrets/client-cert.pem \
+    --sslkey=/etc/container/secrets/client-key.pem \
+    --sslrootcert=/etc/ssl/cert.pem \
+    -P || exit 2
  unset PGPASSWORD
  touch "${DATA_DIR}/standby.signal"
 else
