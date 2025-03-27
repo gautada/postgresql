@@ -107,7 +107,5 @@ fi
 echo "[INFO] Start server ..."
 echo "[INFO] ... with configuration: ${CONFIG_FILE}"
 echo "[INFO] ... with data directory: ${DATA_DIR}"
-PGPASSWORD="$(cat "${HOME}/.pgpass")" || exit 1
-export PGPASSWORD
+echo "${REPLICATION_HOST}:${REPLICATION_PORT}:replication:replicator:$(cat "${HOME}/.pgpass")" > "${HOME}/.pgpass"
 /usr/bin/postgres --config-file="${CONFIG_FILE}" -D "${DATA_DIR}"
-unset PGPASSWORD
