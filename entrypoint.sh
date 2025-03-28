@@ -15,7 +15,7 @@ export ARCHIVE_DIR="${POSTGRESQL_ARCHIVE_DIRECTORY:-/home/postgres/archive}"
 
 # shellcheck disable=SC2317
 
-echo "[INFO] Setup security files ${DATA_DIR}" >&2
+echo "[INFO] Setup security files ${DATA_DIR}"
 mkdir -p /etc/container/secrets/
 cp /mnt/volumes/secrets/*.pem /etc/container/secrets/
 chmod 600 /etc/container/secrets/*.pem
