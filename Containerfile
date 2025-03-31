@@ -28,9 +28,9 @@ LABEL org.opencontainers.image.license="Upstream"
 ARG USER=postgres
 # SHELL ["/bin/ash", "-o", "pipefail", "-c"]
 RUN /usr/sbin/usermod -l $USER alpine \
- && /usr/sbin/usermod -d /home/$USER -m $USER \
- && /usr/sbin/groupmod -n $USER alpine \
- && /bin/echo "$USER:$USER" | /usr/sbin/chpasswd
+  && /usr/sbin/usermod -d /home/$USER -m $USER \
+  && /usr/sbin/groupmod -n $USER alpine \
+  && /bin/echo "$USER:$USER" | /usr/sbin/chpasswd
 
 # ╭―
 # │ BACKUP
@@ -38,7 +38,7 @@ RUN /usr/sbin/usermod -l $USER alpine \
 # COPY backup /etc/container/backup
 COPY backup.sh /usr/bin/backup
 RUN /bin/rm /etc/periodic/hourly/container-backup \
- && /bin/ln -fsv /usr/bin/backup /etc/periodic/15min/backup
+  && /bin/ln -fsv /usr/bin/backup /etc/periodic/15min/backup
 
 
 # ╭―
@@ -51,20 +51,20 @@ COPY entrypoint.sh /usr/bin/container-entrypoint
 # │ APPLICATION        │
 # ╰――――――――――――――――――――╯
 RUN /bin/sed -i 's|dl-cdn.alpinelinux.org/alpine/|mirror.math.princeton.edu/pub/alpinelinux/|g' /etc/apk/repositories \
- && /sbin/apk add --no-cache readline \
-                            "${POSTGRES_PACKAGE}" \
-                            "${POSTGRES}-contrib" \
-                            py3-psycopg \
- && /bin/ln -fsv /mnt/volumes/configmaps/postgresql.conf \
-                /etc/container/postgresql.conf \
- && /bin/ln -fsv /mnt/volumes/configmaps/pg_hba.conf \
-                /etc/container/pg_hba.conf \
- && /bin/ln -fsv /mnt/volumes/configmaps/pg_ident.conf \
-                /etc/container/pg_ident.conf \
- && /bin/mkdir -p /run/postgresql \
- && /bin/chown -R $USER:$USER /run/postgresql \
- && mkdir -p /etc/container/secrets \
- && /bin/chown -R $USER:$USER /etc/container/secrets 
+  && /sbin/apk add --no-cache readline \
+  "${POSTGRES_PACKAGE}" \
+  "${POSTGRES}-contrib" \
+  py3-psycopg \
+  && /bin/ln -fsv /mnt/volumes/configmaps/postgresql.conf \
+  /etc/container/postgresql.conf \
+  && /bin/ln -fsv /mnt/volumes/configmaps/pg_hba.conf \
+  /etc/container/pg_hba.conf \
+  && /bin/ln -fsv /mnt/volumes/configmaps/pg_ident.conf \
+  /etc/container/pg_ident.conf \
+  && /bin/mkdir -p /run/postgresql \
+  && /bin/chown -R $USER:$USER /run/postgresql \
+  && mkdir -p /etc/container/secrets \
+  && /bin/chown -R $USER:$USER /etc/container/secrets 
 
 # ╭――――――――――――――――――――╮
 # │ CONTAINER          │
