@@ -35,7 +35,12 @@ RUN /usr/sbin/usermod -l $USER alpine \
 # ╭―
 # │ BACKUP
 # ╰――――――――――――――――――――
-COPY backup /etc/container/backup
+# COPY backup /etc/container/backup
+COPY backup.sh /usr/bin/backup
+RUN /bin/rm /etc/periodic/hourly/container-backup \
+ && /bin/ln -fsv /usr/bin/backup /etc/periodic/15min/backup
+# /bin/mv /usr/bin/container-backup /usr/bin/backup
+
 
 # ╭―
 # │ ENTRYPOINT
