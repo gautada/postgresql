@@ -106,7 +106,7 @@ if [ -f "${RESTORE_FILE}" ] ; then
 fi
 
 echo "[INFO] Launch crond"
-/usr/bin/sudo /usr/sbin/crond -d  
+/usr/bin/sudo /usr/sbin/crond -b  
 echo "[INFO] Start server ..."
 echo "[INFO] ... with configuration: ${CONFIG_FILE}"
 echo "[INFO] ... with data directory: ${DATA_DIR}"
