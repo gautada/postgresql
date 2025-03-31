@@ -6,6 +6,5 @@
 
 /usr/bin/pg_dumpall \
    --username=postgres \
-   --host=localhost > \
-   "/mnt/volumes/backup/$(/bin/date +"%H%M")postgresql.sql"
+   --file="/mnt/volumes/backup/$(/bin/date +"%H%M")postgresql.sql"
 
