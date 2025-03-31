@@ -30,15 +30,15 @@ ARG USER=postgres
 RUN /usr/sbin/usermod -l $USER alpine \
  && /usr/sbin/usermod -d /home/$USER -m $USER \
  && /usr/sbin/groupmod -n $USER alpine \
- && /bin/echo "$USER:$USER" | /usr/sbin/chpasswd \
+ && /bin/echo "$USER:$USER" | /usr/sbin/chpasswd
 
 # ╭―
 # │ BACKUP
 # ╰――――――――――――――――――――
 # COPY backup /etc/container/backup
-COPY backup.sh /usr/sbin/backup
+COPY backup.sh /usr/bin/backup
 RUN /bin/rm /etc/periodic/hourly/container-backup \
- && /bin/ln -fsv /usr/sbin/backup /etc/periodic/15min/backup
+ && /bin/ln -fsv /usr/bin/backup /etc/periodic/15min/backup
 
 
 # ╭―
