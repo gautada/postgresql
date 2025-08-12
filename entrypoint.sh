@@ -1,7 +1,7 @@
 #!/bin/sh
 #
 # entrypoint: OVerloaded entrypoint. Just run the postgresql server
-
+set -xue
 PG_TYPE=$(echo "${POSTGRESQL_SERVER_TYPE:-PRIMARY}" | tr '[:lower:]' '[:upper:]')
 CONFIG_FILE="${POSTGRESQL_CONFIG_FILE:-/etc/container/postgresql.conf}"
 DATA_DIR="${POSTGRESQL_DATA_DIRECTORY:-/home/postgres/pgdata}"
@@ -112,3 +112,4 @@ echo "[INFO] ... with configuration: ${CONFIG_FILE}"
 echo "[INFO] ... with data directory: ${DATA_DIR}"
 echo "${REPLICATION_HOST}:${REPLICATION_PORT}:replication:replicator:$(cat "${HOME}/.pgpass")" > "${HOME}/.pgpass"
 /usr/bin/postgres --config-file="${CONFIG_FILE}" -D "${DATA_DIR}"
+set +eux
