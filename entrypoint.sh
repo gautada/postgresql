@@ -50,7 +50,9 @@ if [ "${PG_TYPE}" = "PRIMARY" ]; then
    DBURL="${DBURL}sslkey=/etc/container/secrets/client-key.pem&"
    DBURL="${DBURL}sslrootcert=/etc/ssl/cert.pem"
    echo "[INFO] Start base backup ***"
+   set +e
    pg_basebackup --pgdata=./pgdata --dbname "${DBURL}"  --verbose --progress
+   set -e
    echo "[INFO] Promote primary"
    rm -rf "${DATA_DIR}/standby.signal"
    touch "${DATA_DIR}/failover.signal"
