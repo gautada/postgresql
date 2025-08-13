@@ -1,6 +1,14 @@
 #!/bin/sh
 #
 # entrypoint: OVerloaded entrypoint. Just run the postgresql server
+ls -al /mnt/
+echo "-------------------------------------------------------------------------"
+ls -al /mnt/volumes
+echo "-------------------------------------------------------------------------"
+ls -al /mnt/data
+echo "-------------------------------------------------------------------------"
+echo "-------------------------------------------------------------------------"
+
 set -xue
 PG_TYPE=$(echo "${POSTGRESQL_SERVER_TYPE:-PRIMARY}" | tr '[:lower:]' '[:upper:]')
 CONFIG_FILE="${POSTGRESQL_CONFIG_FILE:-/etc/container/postgresql.conf}"
