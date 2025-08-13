@@ -15,13 +15,6 @@ export ARCHIVE_DIR="${POSTGRESQL_ARCHIVE_DIRECTORY:-/home/postgres/archive}"
 
 # shellcheck disable=SC2317
 
-echo "------------------------------------------------------------------------"
-ls -al /mnt/volumes/container
-echo "------------------------------------------------------------------------"
-echo "------------------------------------------------------------------------"
-echo "------------------------------------------------------------------------"
-echo ""
-echo ""
 echo "[INFO] Setup security files ${DATA_DIR}"
 mkdir -p /etc/container/secrets/
 cp /mnt/volumes/secrets/*.pem /etc/container/secrets/
@@ -30,7 +23,6 @@ chmod 600 /etc/container/secrets/*.pem
 ls -al /etc/container/secrets/
 cp /mnt/volumes/secrets/replicator.pgpass /home/postgres/.pgpass
 chmod 600 /home/postgres/.pgpass
-echo "------------------------------------------------------------------------"
 
 if [ "${PG_TYPE}" = "PRIMARY" ]; then
  if [ -d "${DATA_DIR}" ] ; then
@@ -61,7 +53,12 @@ if [ "${PG_TYPE}" = "PRIMARY" ]; then
    DBURL="${DBURL}sslrootcert=/etc/ssl/cert.pem"
    echo "[INFO] Replica to restore: ${DBURL}"
    set +e
-   pg_basebackup --pgdata=./pgdata --dbname "${DBURL}"  --verbose --progress
+   # pg_basebackup --pgdata=./pgdata --dbname "${DBURL}"  --verbose --progress
+   if ! pg_basebackup --pgdata=./pgdata --dbname "${DBURL}"  --verbose --progress; then
+   # if [ $? -ne 0 ]; then
+    echo "[ERROR] Replica restor failed"
+    exit 45
+   fi
    set -e
    echo "[INFO] Promote primary"
    rm -rf "${DATA_DIR}/standby.signal"
