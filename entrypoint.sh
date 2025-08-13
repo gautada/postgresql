@@ -15,6 +15,13 @@ export ARCHIVE_DIR="${POSTGRESQL_ARCHIVE_DIRECTORY:-/home/postgres/archive}"
 
 # shellcheck disable=SC2317
 
+echo "------------------------------------------------------------------------"
+ls -al /mnt/volumes/container
+echo "------------------------------------------------------------------------"
+echo "------------------------------------------------------------------------"
+echo "------------------------------------------------------------------------"
+echo ""
+echo ""
 echo "[INFO] Setup security files ${DATA_DIR}"
 mkdir -p /etc/container/secrets/
 cp /mnt/volumes/secrets/*.pem /etc/container/secrets/
@@ -23,11 +30,13 @@ chmod 600 /etc/container/secrets/*.pem
 ls -al /etc/container/secrets/
 cp /mnt/volumes/secrets/replicator.pgpass /home/postgres/.pgpass
 chmod 600 /home/postgres/.pgpass
+echo "------------------------------------------------------------------------"
 
 if [ "${PG_TYPE}" = "PRIMARY" ]; then
  if [ -d "${DATA_DIR}" ] ; then
   echo "[INFO] Existing data directory: ${DATA_DIR}" >&2
  else
+  echo "[WARN] data directory ${DATA_DIR} does not exist."
   if [ -f "${RESTORE_FILE}" ] ; then
    echo "[INFO] Restore from file: ${RESTORE_FILE}"
    echo "[INFO] Initialize database directory: ${DATA_DIR}"
@@ -40,6 +49,7 @@ if [ "${PG_TYPE}" = "PRIMARY" ]; then
    dir_path=$(dirname "${RESTORE_FILE}")
    echo "[WARN] Files in directory: ${dir_path}"
    ls -l "${dir_path}"
+   echo "[INFO] Restore from replica"
    mkdir -p "${DATA_DIR}"
    chmod 750 -R  "${DATA_DIR}"
    DBURL="postgresql://${REPLICATION_USER}:"
@@ -49,15 +59,15 @@ if [ "${PG_TYPE}" = "PRIMARY" ]; then
    DBURL="${DBURL}sslcert=/etc/container/secrets/client-cert.pem&"
    DBURL="${DBURL}sslkey=/etc/container/secrets/client-key.pem&"
    DBURL="${DBURL}sslrootcert=/etc/ssl/cert.pem"
-   echo "[INFO] Start base backup ***"
+   echo "[INFO] Replica to restore: ${DBURL}"
    set +e
    pg_basebackup --pgdata=./pgdata --dbname "${DBURL}"  --verbose --progress
    set -e
    echo "[INFO] Promote primary"
    rm -rf "${DATA_DIR}/standby.signal"
    touch "${DATA_DIR}/failover.signal"
-  fi
- fi
+  fi # Restore
+ fi # Initialize DB
 elif [ "${PG_TYPE}" = "REPLICA" ]; then
  echo "[INFO] Replicate from primary server ..."
  echo "[INFO] ... Read configuration from ${CONFIG_FILE}"
