@@ -6,7 +6,7 @@ mount --all
 echo "-------------------------------------------------------------------------"
 ls -al /mnt/volumes/container
 echo "-------------------------------------------------------------------------"
-
+ls -al /etc/container
 set -xue
 PG_TYPE=$(echo "${POSTGRESQL_SERVER_TYPE:-PRIMARY}" | tr '[:lower:]' '[:upper:]')
 CONFIG_FILE="${POSTGRESQL_CONFIG_FILE:-/etc/container/postgresql.conf}"
