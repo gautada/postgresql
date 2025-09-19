@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 #
 # entrypoint: OVerloaded entrypoint. Just run the postgresql server
 echo "-------------------------------------------------------------------------"
@@ -86,12 +86,12 @@ elif [ "${PG_TYPE}" = "REPLICA" ]; then
  mkdir -p "${DATA_DIR}"
  chmod 750 -R  "${DATA_DIR}"
  DBURL="postgresql://${REPLICATION_USER}:"
- DBURL="${DBURL}$(tr -d '[:space:]' < "${HOME}/.pgpass")"
- DBURL="${DBURL}@${REPLICATION_HOST}:${REPLICATION_PORT}/replication?"
- DBURL="${DBURL}sslmode=verify-full&"
- DBURL="${DBURL}sslcert=/etc/container/secrets/client-cert.pem&"
- DBURL="${DBURL}sslkey=/etc/container/secrets/client-key.pem&"
- DBURL="${DBURL}sslrootcert=/etc/ssl/cert.pem"
+ DBURL+="$(tr -d '[:space:]' < "${HOME}/.pgpass")"
+ DBURL+="${REPLICATION_HOST}:${REPLICATION_PORT}/replication?"
+ DBURL+="sslmode=verify-full&"
+ DBURL+="sslcert=/etc/container/secrets/client-cert.pem&"
+ DBURL+="sslkey=/etc/container/secrets/client-key.pem&"
+ DBURL+="${DBURL}sslrootcert=/etc/ssl/cert.pem"
  echo "[INFO] Start base backup: ***"
  pg_basebackup --pgdata=./pgdata --dbname "${DBURL}"  --verbose --progress
  touch "${DATA_DIR}/standby.signal"
