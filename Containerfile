@@ -23,11 +23,11 @@ LABEL org.opencontainers.image.source="https://github.com/gautada/${IMAGE_NAME}"
 LABEL org.opencontainers.image.version="${IMAGE_VERSION}"
 LABEL org.opencontainers.image.license="Upstream"
 
-# ╭―
-# │ USER
-# ╰――――――――――――――――――――
+# ╭――――――――――――――――――――╮
+# │ USER               │
+# ╰――――――――――――――――――――╯
+SHELL ["/bin/ash", "-o", "pipefail", "-c"]
 ARG USER=postgres
-# SHELL ["/bin/ash", "-xo", "pipefail", "-c"]
 RUN /usr/sbin/usermod -l $USER alpine \
   && /usr/sbin/usermod -d /home/$USER -m $USER \
   && /usr/sbin/groupmod -n $USER alpine \
