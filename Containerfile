@@ -7,6 +7,7 @@ FROM gautada/alpine:$ALPINE_VERSION as CONTAINER
 # ╭――――――――――――――――――――╮
 # │ VARIABLES          │
 # ╰――――――――――――――――――――╯
+ARG IMAGE_NAME="postgresql"
 ARG IMAGE_VERSION="15.11-r0"
 # ARG POSTGRES_MAJOR="15"
 # ARG POSTGRES="postgresql${POSTGRES_MAJOR}"
@@ -15,18 +16,18 @@ ARG IMAGE_VERSION="15.11-r0"
 # ╭――――――――――――――――――――╮
 # │ METADATA           │
 # ╰――――――――――――――――――――╯
-LABEL org.opencontainers.image.title="postgresql"
+LABEL org.opencontainers.image.title="${IMAGE_NAME}"
 LABEL org.opencontainers.image.description="A PostgreSQL database container."
-LABEL org.opencontainers.image.url="https://hub.docker.com/r/gautada/postgresql"
-LABEL org.opencontainers.image.source="https://github.com/gautada/postgresql"
-LABEL org.opencontainers.image.version="${CONTAINER_VERSION}"
+LABEL org.opencontainers.image.url="https://hub.docker.com/r/gautada/${IMAGE_NAME}"
+LABEL org.opencontainers.image.source="https://github.com/gautada/${IMAGE_NAME}"
+LABEL org.opencontainers.image.version="${IMAGE_VERSION}"
 LABEL org.opencontainers.image.license="Upstream"
 
 # ╭―
 # │ USER
 # ╰――――――――――――――――――――
 ARG USER=postgres
-# SHELL ["/bin/ash", "-o", "pipefail", "-c"]
+# SHELL ["/bin/ash", "-xo", "pipefail", "-c"]
 RUN /usr/sbin/usermod -l $USER alpine \
   && /usr/sbin/usermod -d /home/$USER -m $USER \
   && /usr/sbin/groupmod -n $USER alpine \
@@ -50,12 +51,14 @@ COPY entrypoint.sh /usr/bin/container-entrypoint
 # ╭――――――――――――――――――――╮
 # │ APPLICATION        │
 # ╰――――――――――――――――――――╯
-RUN MAJOR_VERSION="$(echo $IMAGE_VERSION | cut -d . -f1)" \
+RUN  MAJOR_VERSION="$(echo "${IMAGE_VERSION}" | cut -d . -f1)" \
  && POSTGRESQL_PACKAGE="${IMAGE_NAME}${MAJOR_VERSION}" \
- && echo "${POSTGRERSQL_PACKAGE}"
+ && echo "${POSTGRESQL_PACKAGE}" \
+ && echo "${MAJOR_VERSION}" \
+ && echo "------------------------------------------------------------------" \
  && /bin/sed -i 's|dl-cdn.alpinelinux.org/alpine/|mirror.math.princeton.edu/pub/alpinelinux/|g' /etc/apk/repositories \
- && /sbin/apk add --no-cache readline "${POSTGRES_PACKAGE}=${IMAGE_VERSION}" \
-  "${POSTGRES}-contrib" py3-psycopg \
+ && /sbin/apk add --no-cache readline "${POSTGRESQL_PACKAGE}=${IMAGE_VERSION}" \
+  "${POSTGRESQL_PACKAGE}-contrib" py3-psycopg \
  && /bin/ln -fsv /mnt/volumes/configmaps/postgresql.conf \
   /etc/container/postgresql.conf \
  && /bin/ln -fsv /mnt/volumes/configmaps/pg_hba.conf \
