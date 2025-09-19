@@ -32,3 +32,13 @@ repos:
         entry: yamllint
         language: python
         files: '\.ya?ml$'
+  - repo: https://github.com/sqlfluff/sqlfluff
+    rev: "3.4.2"   # pin to a released tag
+    hooks:
+      - id: sqlfluff-lint
+        # args: ["--dialect", "postgres"]   # or set in .sqlfluff / pyproject
+        # Limit to SQL files (optional):
+        files: ".(sql|ddl|dml)$"
+        # If you use dbt templating, add the extras:
+        # additional_dependencies: ["dbt-bigquery==1.8.*",
+        # "sqlfluff-templater-dbt"]
