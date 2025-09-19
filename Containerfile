@@ -1,4 +1,4 @@
-ARG ALPINE_VERSION=latest
+ARG ALPINE_VERSION=3.22
 
 # │ STAGE: CONTAINER
 # ╰――――――――――――――――――――――――――――――――――――――――――――――――――――――
@@ -8,9 +8,9 @@ FROM gautada/alpine:$ALPINE_VERSION as CONTAINER
 # │ VARIABLES          │
 # ╰――――――――――――――――――――╯
 ARG IMAGE_VERSION="15.11-r0"
-ARG POSTGRES_MAJOR="15"
-ARG POSTGRES="postgresql${POSTGRES_MAJOR}"
-ARG POSTGRES_PACKAGE="${POSTGRES}=${IMAGE_VERSION}"
+# ARG POSTGRES_MAJOR="15"
+# ARG POSTGRES="postgresql${POSTGRES_MAJOR}"
+# ARG POSTGRES_PACKAGE="${POSTGRES}=${IMAGE_VERSION}"
 
 # ╭――――――――――――――――――――╮
 # │ METADATA           │
@@ -50,10 +50,11 @@ COPY entrypoint.sh /usr/bin/container-entrypoint
 # ╭――――――――――――――――――――╮
 # │ APPLICATION        │
 # ╰――――――――――――――――――――╯
-RUN MAJOR_VERSION="$(echo $IMAGE_VERSION | cur -d . -f1)" \
+RUN MAJOR_VERSION="$(echo $IMAGE_VERSION | cut -d . -f1)" \
  && POSTGRESQL_PACKAGE="${IMAGE_NAME}${MAJOR_VERSION}" \
+ && echo "${POSTGRERSQL_PACKAGE}"
  && /bin/sed -i 's|dl-cdn.alpinelinux.org/alpine/|mirror.math.princeton.edu/pub/alpinelinux/|g' /etc/apk/repositories \
- && /sbin/apk add --no-cache readline "${POSTGRES_PACKAGE}" \
+ && /sbin/apk add --no-cache readline "${POSTGRES_PACKAGE}=${IMAGE_VERSION}" \
   "${POSTGRES}-contrib" py3-psycopg \
  && /bin/ln -fsv /mnt/volumes/configmaps/postgresql.conf \
   /etc/container/postgresql.conf \
