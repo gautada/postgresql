@@ -50,21 +50,21 @@ COPY entrypoint.sh /usr/bin/container-entrypoint
 # ╭――――――――――――――――――――╮
 # │ APPLICATION        │
 # ╰――――――――――――――――――――╯
-RUN /bin/sed -i 's|dl-cdn.alpinelinux.org/alpine/|mirror.math.princeton.edu/pub/alpinelinux/|g' /etc/apk/repositories \
-  && /sbin/apk add --no-cache readline \
-  "${POSTGRES_PACKAGE}" \
-  "${POSTGRES}-contrib" \
-  py3-psycopg \
-  && /bin/ln -fsv /mnt/volumes/configmaps/postgresql.conf \
+RUN MAJOR_VERSION="$(echo $IMAGE_VERSION | cur -d . -f1)" \
+ && POSTGRESQL_PACKAGE="${IMAGE_NAME}${MAJOR_VERSION}" \
+ && /bin/sed -i 's|dl-cdn.alpinelinux.org/alpine/|mirror.math.princeton.edu/pub/alpinelinux/|g' /etc/apk/repositories \
+ && /sbin/apk add --no-cache readline "${POSTGRES_PACKAGE}" \
+  "${POSTGRES}-contrib" py3-psycopg \
+ && /bin/ln -fsv /mnt/volumes/configmaps/postgresql.conf \
   /etc/container/postgresql.conf \
-  && /bin/ln -fsv /mnt/volumes/configmaps/pg_hba.conf \
+ && /bin/ln -fsv /mnt/volumes/configmaps/pg_hba.conf \
   /etc/container/pg_hba.conf \
-  && /bin/ln -fsv /mnt/volumes/configmaps/pg_ident.conf \
+ && /bin/ln -fsv /mnt/volumes/configmaps/pg_ident.conf \
   /etc/container/pg_ident.conf \
-  && /bin/mkdir -p /run/postgresql \
-  && /bin/chown -R $USER:$USER /run/postgresql \
-  && mkdir -p /etc/container/secrets \
-  && /bin/chown -R $USER:$USER /etc/container/secrets 
+ && /bin/mkdir -p /run/postgresql \
+ && /bin/chown -R $USER:$USER /run/postgresql \
+ && mkdir -p /etc/container/secrets \
+ && /bin/chown -R $USER:$USER /etc/container/secrets 
 
 # ╭――――――――――――――――――――╮
 # │ CONTAINER          │
