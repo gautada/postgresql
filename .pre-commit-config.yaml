@@ -65,4 +65,4 @@ repos:
           - --gitignore         # respect .gitignore
           - --ignore
           - "dist/**,build/**,**/*.min.*,**/*.generated.*"
-        stages: [commit]         # or [push] if you prefer
+        stages: [pre-commit]         # or [push] if you prefer
