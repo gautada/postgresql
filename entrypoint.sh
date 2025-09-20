@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# entrypoint: OVerloaded entrypoint. Just run the postgresql server
+# entrypoint: Overloaded entrypoint. Just run the postgresql server
 echo "-------------------------------------------------------------------------"
 mount --all
 echo "-------------------------------------------------------------------------"
@@ -8,6 +8,7 @@ ls -al /mnt/volumes/container
 echo "-------------------------------------------------------------------------"
 ls -al /etc/container
 set -xue
+
 PG_TYPE=$(echo "${POSTGRESQL_SERVER_TYPE:-PRIMARY}" | tr '[:lower:]' '[:upper:]')
 CONFIG_FILE="${POSTGRESQL_CONFIG_FILE:-/etc/container/postgresql.conf}"
 DATA_DIR="${POSTGRESQL_DATA_DIRECTORY:-/home/postgres/pgdata}"
@@ -18,6 +19,7 @@ REPLICATION_USER="${POSTGRESQL_REPLICATION_USER:-replicator}"
 # REPLICATION_PASSWORD="${POSTGRESQL_REPLICATION_PASSWORD:-replicator}"
 BACKUP_RESTORE_FILE="${POSTGRESQL_BACKUP_RESTORE_FILE:-True}"
 export ARCHIVE_DIR="${POSTGRESQL_ARCHIVE_DIRECTORY:-/home/postgres/archive}"
+echo "${REPLICATION_USER}"
 
 # shellcheck disable=SC2317
 
@@ -31,70 +33,9 @@ cp /mnt/volumes/secrets/replicator.pgpass /home/postgres/.pgpass
 chmod 600 /home/postgres/.pgpass
 
 if [ "${PG_TYPE}" = "PRIMARY" ]; then
- if [ -d "${DATA_DIR}" ] ; then
-  echo "[INFO] Existing data directory: ${DATA_DIR}" >&2
- else
-  echo "[WARN] data directory ${DATA_DIR} does not exist."
-  if [ -f "${RESTORE_FILE}" ] ; then
-   echo "[INFO] Restore from file: ${RESTORE_FILE}"
-   echo "[INFO] Initialize database directory: ${DATA_DIR}"
-   /usr/bin/initdb "${DATA_DIR}"
-   pg_ctl -D "${DATA_DIR}" start
-   psql -U postgres -f "${RESTORE_FILE}"
-   pg_ctl -D "${DATA_DIR}" stop
-  else
-   echo "[WARN] Could not find a restore file ${RESTORE_FILE} "
-   dir_path=$(dirname "${RESTORE_FILE}")
-   echo "[WARN] Files in directory: ${dir_path}"
-   ls -l "${dir_path}"
-   echo "[INFO] Restore from replica"
-   mkdir -p "${DATA_DIR}"
-   chmod 750 -R  "${DATA_DIR}"
-   DBURL="postgresql://${REPLICATION_USER}:"
-   DBURL="${DBURL}$(tr -d '[:space:]' < "${HOME}/.pgpass")"
-   DBURL="${DBURL}@${REPLICATION_HOST}:${REPLICATION_PORT}/replication?"
-   DBURL="${DBURL}sslmode=verify-full&"
-   DBURL="${DBURL}sslcert=/etc/container/secrets/client-cert.pem&"
-   DBURL="${DBURL}sslkey=/etc/container/secrets/client-key.pem&"
-   DBURL="${DBURL}sslrootcert=/etc/ssl/cert.pem"
-   echo "[INFO] Replica to restore: ${DBURL}"
-   set +e
-   # pg_basebackup --pgdata=./pgdata --dbname "${DBURL}"  --verbose --progress
-   if ! pg_basebackup --pgdata=./pgdata --dbname "${DBURL}"  --verbose --progress; then
-   # if [ $? -ne 0 ]; then
-    echo "[ERROR] Replica restor failed"
-    exit 45
-   fi
-   set -e
-   echo "[INFO] Promote primary"
-   rm -rf "${DATA_DIR}/standby.signal"
-   touch "${DATA_DIR}/failover.signal"
-  fi # Restore
- fi # Initialize DB
+ exec /etc/container/entrypoint-primary
 elif [ "${PG_TYPE}" = "REPLICA" ]; then
- echo "[INFO] Replicate from primary server ..."
- echo "[INFO] ... Read configuration from ${CONFIG_FILE}"
- line=$(grep "primary_conninfo" "${CONFIG_FILE}")
- REPLICATION_HOST="$(echo "${line}" | sed -n "s/.*host=\([^ ]*\).*/\1/p")"
- REPLICATION_PORT="$(echo "${line}" | sed -n "s/.*port=\([^ ]*\).*/\1/p")"
- REPLICATION_USER="$(echo "${line}" | sed -n "s/.*user=\([^ ]*\).*/\1/p")"
- # REPLICATION_PASSWORD=${POSTGRESQL_REPLICATION_PASSWORD:-$(echo "{$line}" | sed -n "s/.*user=\([^ ]*\).*/\1/p")}
- echo "[INFO] Replication parameters ..."
- echo "[INFO] ... Host: ${REPLICATION_HOST}"
- echo "[INFO] ... Port: ${REPLICATION_PORT}"
- echo "[INFO] ... User: ${REPLICATION_USER}"
- mkdir -p "${DATA_DIR}"
- chmod 750 -R  "${DATA_DIR}"
- DBURL="postgresql://${REPLICATION_USER}:"
- DBURL+="$(tr -d '[:space:]' < "${HOME}/.pgpass")"
- DBURL+="${REPLICATION_HOST}:${REPLICATION_PORT}/replication?"
- DBURL+="sslmode=verify-full&"
- DBURL+="sslcert=/etc/container/secrets/client-cert.pem&"
- DBURL+="sslkey=/etc/container/secrets/client-key.pem&"
- DBURL+="${DBURL}sslrootcert=/etc/ssl/cert.pem"
- echo "[INFO] Start base backup: ***"
- pg_basebackup --pgdata=./pgdata --dbname "${DBURL}"  --verbose --progress
- touch "${DATA_DIR}/standby.signal"
+ exec /etc/container/entrypoint-replica
 else
  echo "[ERROR] Uknown server type(${PG_TYPE})"
  exit 1
