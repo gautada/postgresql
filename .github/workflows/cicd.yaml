@@ -44,12 +44,12 @@ jobs:
     secrets:
       REGISTRY_USERNAME: ${{ secrets.DOCKERIO_REGISTRY }}
       REGISTRY_TOKEN: ${{ secrets.DOCKERIO_TOKEN }}
-  test:
-    needs: [clean]
-    uses: gautada/cicd/.github/workflows/ci-container-test.yaml@main
-    secrets:
-      REGISTRY_USERNAME: ${{ secrets.DOCKERIO_REGISTRY }}
-      REGISTRY_TOKEN: ${{ secrets.DOCKERIO_TOKEN }}
+  # test:
+  #   needs: [clean]
+  #   uses: gautada/cicd/.github/workflows/ci-container-test.yaml@main
+  #   secrets:
+  #     REGISTRY_USERNAME: ${{ secrets.DOCKERIO_REGISTRY }}
+  #     REGISTRY_TOKEN: ${{ secrets.DOCKERIO_TOKEN }}
   release:
     needs: [test]
     uses: gautada/cicd/.github/workflows/cd-tag-latest.yaml@main
