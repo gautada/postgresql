@@ -22,7 +22,6 @@ manifest/
 .dockerignore
 
 .nova
-_containers
-.env
-
-_*
+node_modules/
+package-lock.json
+package.json

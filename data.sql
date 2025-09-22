@@ -1,3 +1,4 @@
+-- sqlfluff:dialect:postgres
 -- Step 2: Insert sample customers (100 customers)
 INSERT INTO customers (first_name, last_name, email, phone) VALUES
 ('John', 'Doe', 'john.doe1@example.com', '555-0101'),
@@ -13,7 +14,10 @@ INSERT INTO customers (first_name, last_name, email, phone) VALUES
 -- Add 90 more customers...
 
 -- Step 3: Insert sample addresses (100 addresses)
-INSERT INTO addresses (customer_id, street, city, state, zip_code, country) VALUES
+INSERT INTO addresses (
+    customer_id, street, city,
+    state, zip_code, country
+) VALUES
 (1, '123 Main St', 'New York', 'NY', '10001', 'USA'),
 (2, '456 Elm St', 'Los Angeles', 'CA', '90001', 'USA');
 -- Add 98 more addresses...
