@@ -45,7 +45,7 @@ RUN /bin/rm /etc/periodic/hourly/container-backup \
 # │ ENTRYPOINT         │
 # ╰――――――――――――――――――――╯
 COPY entrypoint.sh /usr/bin/container-entrypoint
-COPY entrypoint-primary.sh /etc/container/entrypoiny-primary
+COPY entrypoint-primary.sh /etc/container/entrypoint-primary
 COPY entrypoint-replica.sh /etc/contianer/entrypoint-replica
 
 # ╭――――――――――――――――――――╮
@@ -69,11 +69,15 @@ RUN  MAJOR_VERSION="$(echo "${IMAGE_VERSION}" | cut -d . -f1)" \
  && /bin/chown -R $USER:$USER /run/postgresql \
  && mkdir -p /etc/container/secrets \
  && /bin/chown -R $USER:$USER /etc/container/secrets 
+COPY schema.sql /tmp/schema.sql
+COPY data.sql /tmp/data.sql
+COPY postgresql.conf /mnt/volumes/configmaps/postgresql.conf
 
 # ╭――――――――――――――――――――╮
 # │ CONTAINER          │
 # ╰――――――――――――――――――――╯
 USER $USER
+RUN cat /tmp/schema.sql /tmp/data.sql > /tmp/test.sql
 VOLUME /mnt/volumes/backup
 VOLUME /mnt/volumes/configmaps
 VOLUME /mnt/volumes/container
