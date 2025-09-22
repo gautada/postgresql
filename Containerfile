@@ -8,7 +8,8 @@ FROM gautada/alpine:$ALPINE_VERSION as CONTAINER
 # │ VARIABLES          │
 # ╰――――――――――――――――――――╯
 ARG IMAGE_NAME="postgresql"
-ARG IMAGE_VERSION="15.11-r0"
+ARG IMAGE_VERSION="15.11"
+ARG PACKAGE_RELEASE="r0"
 # ARG POSTGRES_MAJOR="15"
 # ARG POSTGRES="postgresql${POSTGRES_MAJOR}"
 # ARG POSTGRES_PACKAGE="${POSTGRES}=${IMAGE_VERSION}"
@@ -53,11 +54,9 @@ COPY entrypoint-replica.sh /etc/contianer/entrypoint-replica
 # ╰――――――――――――――――――――╯
 RUN  MAJOR_VERSION="$(echo "${IMAGE_VERSION}" | cut -d . -f1)" \
  && POSTGRESQL_PACKAGE="${IMAGE_NAME}${MAJOR_VERSION}" \
- && echo "${POSTGRESQL_PACKAGE}" \
- && echo "${MAJOR_VERSION}" \
- && echo "------------------------------------------------------------------" \
+ && PACKAGE_VERSION="${IMAGE_VERSION}-${PACKAGE_RELEASE}" \
  && /bin/sed -i 's|dl-cdn.alpinelinux.org/alpine/|mirror.math.princeton.edu/pub/alpinelinux/|g' /etc/apk/repositories \
- && /sbin/apk add --no-cache readline "${POSTGRESQL_PACKAGE}=${IMAGE_VERSION}" \
+ && /sbin/apk add --no-cache readline "${POSTGRESQL_PACKAGE}=${PACKAGE_VERSION}" \
   "${POSTGRESQL_PACKAGE}-contrib" py3-psycopg bash\
  && /bin/ln -fsv /mnt/volumes/configmaps/postgresql.conf \
   /etc/container/postgresql.conf \
