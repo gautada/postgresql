@@ -32,14 +32,14 @@ ARCHIVE_DIR="${POSTGRESQL_ARCHIVE_DIRECTORY:-/home/postgres/archive}"
 #
 # shellcheck disable=SC2317
  
-# echo "[INFO] Setup security files..."
-# mkdir -p /etc/container/secrets/
-# cp /mnt/volumes/secrets/*.pem /etc/container/secrets/
-# chmod 600 /etc/container/secrets/*.pem
-# # kcat /etc/ssl/cert.pem /etc/container/secrets/ca.pem
-# # ls -al /etc/container/secrets/
-# cp /mnt/volumes/secrets/replicator.pgpass /home/postgres/.pgpass
-# chmod 600 /home/postgres/.pgpass
+echo "[INFO] Setup security files..."
+mkdir -p /etc/container/secrets/
+cp /mnt/volumes/secrets/*.pem /etc/container/secrets/
+chmod 600 /etc/container/secrets/*.pem
+# kcat /etc/ssl/cert.pem /etc/container/secrets/ca.pem
+# ls -al /etc/container/secrets/
+cp /mnt/volumes/secrets/replicator.pgpass /home/postgres/.pgpass
+chmod 600 /home/postgres/.pgpass
 
 
 if [ "${PG_TYPE}" = "PRIMARY" ]; then
