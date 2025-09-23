@@ -48,6 +48,8 @@ RUN /bin/rm /etc/periodic/hourly/container-backup \
 COPY entrypoint.sh /usr/bin/container-entrypoint
 COPY entrypoint-primary.sh /etc/container/entrypoint-primary
 COPY entrypoint-replica.sh /etc/contianer/entrypoint-replica
+COPY entrypoint-tls.sh /etc/contianer/entrypoint-tls
+
 
 # ╭――――――――――――――――――――╮
 # │ APPLICATION        │
