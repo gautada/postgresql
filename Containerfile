@@ -57,7 +57,7 @@ RUN  MAJOR_VERSION="$(echo "${IMAGE_VERSION}" | cut -d . -f1)" \
  && PACKAGE_VERSION="${IMAGE_VERSION}-${PACKAGE_RELEASE}" \
  && /bin/sed -i 's|dl-cdn.alpinelinux.org/alpine/|mirror.math.princeton.edu/pub/alpinelinux/|g' /etc/apk/repositories \
  && /sbin/apk add --no-cache readline "${POSTGRESQL_PACKAGE}=${PACKAGE_VERSION}" \
-  "${POSTGRESQL_PACKAGE}-contrib" py3-psycopg bash\
+  "${POSTGRESQL_PACKAGE}-contrib" py3-psycopg bash openssl \
  && /bin/ln -fsv /mnt/volumes/configmaps/postgresql.conf \
   /etc/container/postgresql.conf \
  && /bin/ln -fsv /mnt/volumes/configmaps/pg_hba.conf \
