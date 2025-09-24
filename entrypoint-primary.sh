@@ -53,10 +53,11 @@ ARCHIVE_DIR="${POSTGRESQL_ARCHIVE_DIRECTORY:-/home/postgres/archive}"
   if ! pg_basebackup --pgdata=./pgdata --dbname "${DBURL}"  --verbose --progress; then
     echo "[WARN] Replica restore failed"
     echo "[INFO] Restore from archive(${ARCHIVE_DIR}) directory"
-    LATEST_SQL_FILE=$(find "${ARCHIVE_DIR}" -maxdepth 1 \
-      -name "*.sql" -type f -printf "%T@ %p\n" \
-      | sort -n | tail -1 | cut -d' ' -f2-)
-    # LATEST_SQL_FILE="$(ls -t "${ARCHIVE_DIR}"/*.sql 2>/dev/null | head -n 1)"
+    # LATEST_SQL_FILE=$(find "${ARCHIVE_DIR}" -maxdepth 1 \
+    #   -name "*.sql" -type f -printf "%T@ %p\n" \
+    #   | sort -n | tail -1 | cut -d' ' -f2-)
+    # shellcheck disable=SC2012
+    LATEST_SQL_FILE="$(ls -t "${ARCHIVE_DIR}"/*.sql 2>/dev/null | head -n 1)"
     if [ -n "${LATEST_SQL_FILE}" ] ; then
       echo "[INFO] Overload restore file(${RESTORE_FILE} -> ${LATEST_SQL_FILE})"
       RESTORE_FILE="${LATEST_SQL_FILE}"
