@@ -20,19 +20,21 @@ REPLICATION_USER="${POSTGRESQL_REPLICATION_USER:-replicator}"
 #   echo "[INFO] Existing data directory: ${DATA_DIR}" >&2
 #  else
 #   echo "[WARN] data directory ${DATA_DIR} does not exist."
-if [ -f "${RESTORE_FILE}" ] ; then
-  echo "[INFO] Restore from file: ${RESTORE_FILE}"
-  echo "[INFO] Initialize database directory: ${DATA_DIR}"
-  /usr/bin/initdb "${DATA_DIR}"
-  pg_ctl -D "${DATA_DIR}" start
-  psql -U postgres -f "${RESTORE_FILE}"
-  pg_ctl -D "${DATA_DIR}" stop
-  echo "[INFO] Restored DB from file"
-else
-  echo "[WARN] Could not find a restore file ${RESTORE_FILE} "
-  dir_path=$(dirname "${RESTORE_FILE}")
-  echo "[WARN] Files in directory: ${dir_path}"
-  ls -l "${dir_path}"
+
+
+# if [ -f "${RESTORE_FILE}" ] ; then
+#   echo "[INFO] Restore from file: ${RESTORE_FILE}"
+#   echo "[INFO] Initialize database directory: ${DATA_DIR}"
+#   /usr/bin/initdb "${DATA_DIR}"
+#   pg_ctl -D "${DATA_DIR}" start
+#   psql -U postgres -f "${RESTORE_FILE}"
+#   pg_ctl -D "${DATA_DIR}" stop
+#   echo "[INFO] Restored DB from file"
+# else
+#   echo "[WARN] Could not find a restore file ${RESTORE_FILE} "
+#   dir_path=$(dirname "${RESTORE_FILE}")
+#   echo "[WARN] Files in directory: ${dir_path}"
+#   ls -l "${dir_path}"
   echo "[INFO] Restore from replica"
   mkdir -p "${DATA_DIR}"
   chmod 750 -R  "${DATA_DIR}"
@@ -46,13 +48,24 @@ else
   echo "[INFO] Replica to restore: ${DBURL}"
   set +e
   # pg_basebackup --pgdata=./pgdata --dbname "${DBURL}"  --verbose --progress
-  if ! pg_basebackup --pgdata=./pgdata --dbname "${DBURL}"  --verbose --progress; then
   # if [ $? -ne 0 ]; then
-    echo "[ERROR] Replica restor failed"
-    exit 45
+  if ! pg_basebackup --pgdata=./pgdata --dbname "${DBURL}"  --verbose --progress; then
+    if [ -f "${RESTORE_FILE}" ] ; then
+      set -e
+      echo "[INFO] Restore from file: ${RESTORE_FILE}"
+      echo "[INFO] Initialize database directory: ${DATA_DIR}"
+      /usr/bin/initdb "${DATA_DIR}"
+      pg_ctl -D "${DATA_DIR}" start
+      psql -U postgres -f "${RESTORE_FILE}"
+      pg_ctl -D "${DATA_DIR}" stop
+      echo "[INFO] Restored DB from file"
+    else
+      echo "[ERROR] Replica restore failed"
+      exit 45
+    fi
   fi
   set -e
   echo "[INFO] Promote primary"
   rm -rf "${DATA_DIR}/standby.signal"
   touch "${DATA_DIR}/failover.signal"
-fi # Restore
+# fi # Restore
