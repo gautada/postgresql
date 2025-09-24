@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -xue
+
 ORIGIN_DIR="/mnt/volumes/secrets"
 DEST_DIR="/etc/container/secrets"
 mkdir -p "${DEST_DIR}"
@@ -36,7 +38,7 @@ if [ ! -f "${ORIGIN_DIR}/ca.pem" ] ; then
   cp rootCA.crt "${DEST_DIR}/ca.pem"
 else
   # Existing files from origin
-  cp "${ORIGIN_DIR}/*.pem" "${DEST_DIR}/"
+  cp "${ORIGIN_DIR}"/*.pem "${DEST_DIR}/"
   cp "${ORIGIN_DIR}/replicator.pgpass" "/home/postgres/.pgpass"
 fi
 
@@ -55,9 +57,13 @@ if [ ! -f "${DEST_DIR}/ca.pem" ] ; then
   exit 97
 fi
 
-chmod 600 "${DEST_DIR}/*.pem"
 
-if [ ! -f /home/postgres/.pgpass ] ; then
-  echo "no-password-provided" > /home/postgresql/.pgpass
+ls -al "${DEST_DIR}"/*.pem
+
+chmod 600 "${DEST_DIR}"/*.pem
+
+if [ ! -f "/home/postgres/.pgpass" ] ; then
+  echo "no-password-provided" > /home/postgres/.pgpass
 fi
 chmod 600 /home/postgres/.pgpass
+set +xue
