@@ -66,9 +66,9 @@ ARCHIVE_DIR="${POSTGRESQL_ARCHIVE_DIRECTORY:-/home/postgres/archive}"
       set -e
       echo "[INFO] Restore from file: ${RESTORE_FILE}"
       echo "[INFO] Initialize database directory: ${DATA_DIR}"
-      /usr/bin/initdb "${DATA_DIR}"
+      /usr/bin/initdb "${DATA_DIR}" > /tmp/initdb.log
       pg_ctl -D "${DATA_DIR}" start
-      psql -U postgres -f "${RESTORE_FILE}"
+      psql -U postgres -f "${RESTORE_FILE}" > /tmp/restore.log
       pg_ctl -D "${DATA_DIR}" stop
       echo "[INFO] Restored DB from file"
     else
